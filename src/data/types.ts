@@ -1,6 +1,6 @@
 import type { CatalogItem } from '../engine'
 
-export type MentorId = 'caesar' | 'marcus' | 'musashi' | 'cruyff' | 'bruce'
+export type MentorId = 'caesar' | 'marcus' | 'musashi' | 'cruyff' | 'bruce' | 'jobs'
 
 export interface QuoteItem extends CatalogItem {
   type: 'quote'
@@ -36,14 +36,14 @@ export type ArtKind =
   | 'pan'
   | 'belt'
 
-export type ShirtPattern = 'plain' | 'hoops' | 'stripes' | 'pinstripe' | 'sash' | 'halves' | 'chevron'
+export type ShirtPattern = 'plain' | 'bands' | 'stripes' | 'pinstripe' | 'sash' | 'halves' | 'chevron'
 
 export interface ArtSpec {
   kind: ArtKind
-  /** [tile background, main object colour, detail colour] */
+  /** [light accent, main object color, detail color] */
   colors: [string, string, string]
   pattern?: ShirtPattern
-  /** Short text printed on the object (a shirt number, a label). */
+  /** Short text printed on the object (a jersey number, a label). */
   mark?: string
 }
 
@@ -57,8 +57,6 @@ export interface Shop {
 
 export interface FindItem extends CatalogItem {
   type: 'find'
-  /** Catalog number shown as N° 0142. */
-  no: number
   name: string
   shop: string
   price: number
@@ -71,14 +69,14 @@ export interface FitItem extends CatalogItem {
   name: string
   blurb: string
   findIds: string[]
-  /** A fit is something you wear; a kit is a set of things you use. */
-  label: 'Fit' | 'Kit'
+  /** An outfit is something you wear; a set is a group of things you use. */
+  label: 'Outfit' | 'Set'
 }
 
 export interface PostItem extends CatalogItem {
   type: 'post'
   author: string
-  crew: string
+  club: string
   text: string
   likes: number
   replies: number
@@ -94,7 +92,7 @@ export interface RitualItem extends CatalogItem {
 
 export type AnyItem = QuoteItem | FindItem | FitItem | PostItem | RitualItem
 
-export interface Crew {
+export interface Club {
   id: string
   name: string
   blurb: string

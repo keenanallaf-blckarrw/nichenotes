@@ -16,7 +16,7 @@ import {
   type Tags,
   type VibeId,
 } from '../engine'
-import { CATALOG, CREW_BY_ID, MENTORS, itemById } from '../data/catalog'
+import { CATALOG, CLUB_BY_ID, MENTORS, itemById } from '../data/catalog'
 import type { AnyItem, MentorId, PostItem } from '../data/types'
 import * as storage from './storage'
 
@@ -30,7 +30,7 @@ export interface Scout {
 }
 
 interface Persisted {
-  v: 1
+  v: 2
   onboarded: boolean
   handle: string
   mentor: MentorId | null
@@ -62,9 +62,7 @@ export interface Toast {
 }
 
 export interface OnboardingInput {
-  handle: string
   vibes: VibeId[]
-  pairs: Tags[]
   mentor: MentorId | null
 }
 
@@ -77,7 +75,7 @@ function today(): string {
 
 function fresh(): Persisted {
   return {
-    v: 1,
+    v: 2,
     onboarded: false,
     handle: '',
     mentor: null,
@@ -95,7 +93,7 @@ function fresh(): Persisted {
 
 function boot(): Persisted {
   const saved = storage.load<Persisted>()
-  const base = saved?.v === 1 ? saved : fresh()
+  const base = saved?.v === 2 ? saved : fresh()
   // New session: fade stale interests, then freeze a snapshot for trend arrows.
   return { ...base, profile: takeSnapshot(decayProfile(base.profile, Date.now())) }
 }
@@ -108,7 +106,7 @@ function useStoreValue() {
   const [state, setState] = useState<Persisted>(boot)
   const [feed, setFeed] = useState<FeedEntry[]>([])
   const [toasts, setToasts] = useState<Toast[]>([])
-  // Combos unlocked since the last batch; each gets its own card at the top of the next one.
+  // Combos unlocked but not yet celebrated. One card per batch, so it stays special.
   const pendingUnlocks = useRef<VibeId[]>([])
   const stateRef = useRef(state)
   stateRef.current = state
@@ -129,7 +127,7 @@ function useStoreValue() {
       if (!unlocked.length) return
       for (const id of unlocked) {
         const combo = COMBO_BY_ID[id]
-        toast({ tone: 'unlock', title: `New vibe unlocked: ${combo.label}`, body: combo.blurb })
+        toast({ tone: 'unlock', title: `Unlocked: ${combo.label}`, body: combo.blurb })
       }
       pendingUnlocks.current.push(...unlocked)
     },
@@ -177,8 +175,8 @@ function useStoreValue() {
       now: Date.now(),
       recent,
     })
-    const unlockEntries = pendingUnlocks.current.map((u) => ({ key: `u-${u}-${s.shown.length}`, unlock: u }))
-    pendingUnlocks.current = []
+    const next = pendingUnlocks.current.shift()
+    const unlockEntries = next ? [{ key: `u-${next}-${s.shown.length}`, unlock: next }] : []
     const entries = batch.map((r, i) => ({ key: `${r.item.id}-${s.shown.length + i}`, id: r.item.id, reason: r.reason }))
     feedRef.current = [...feedRef.current, ...unlockEntries, ...entries]
     setFeed((f) => [...f, ...unlockEntries, ...entries])
@@ -222,7 +220,7 @@ function useStoreValue() {
       track(on ? 'save' : 'unsave', item)
       if (on) {
         injectSimilar(item, 2)
-        toast({ tone: 'info', title: 'Saved to your Stash' })
+        toast({ tone: 'info', title: 'Saved' })
       }
     },
     [track, update, injectSimilar, toast],
@@ -233,7 +231,7 @@ function useStoreValue() {
       update((s) => ({ ...s, hidden: toggle(s.hidden, item.id, true) }))
       track('hide', item)
       setFeed((f) => f.filter((e) => e.id !== item.id))
-      toast({ tone: 'info', title: 'Got it. Less like that.' })
+      toast({ tone: 'info', title: "You'll see less like this" })
     },
     [track, update, toast],
   )
@@ -263,24 +261,24 @@ function useStoreValue() {
   )
 
   const addPost = useCallback(
-    (crewId: string, text: string) => {
-      const crew = CREW_BY_ID[crewId]
+    (clubId: string, text: string) => {
+      const club = CLUB_BY_ID[clubId]
       const post: PostItem = {
         id: `mine-${Date.now()}`,
         type: 'post',
         author: stateRef.current.handle || 'you',
-        crew: crewId,
+        club: clubId,
         text,
         likes: 0,
         replies: 0,
         mine: true,
-        tags: crew.tags,
-        source: crewId,
+        tags: club.tags,
+        source: clubId,
         createdAt: Date.now(),
         popularity: 0,
       }
       update((s) => ({ ...s, myPosts: [post, ...s.myPosts] }))
-      signal('post', crew.tags, 'post')
+      signal('post', club.tags, 'post')
       return post
     },
     [signal, update],
@@ -289,7 +287,7 @@ function useStoreValue() {
   const follow = useCallback(
     (id: VibeId) => {
       signal('follow', { [id]: 1 })
-      toast({ tone: 'info', title: `More ${labelOf(id)} coming up` })
+      toast({ tone: 'info', title: `You'll see more ${labelOf(id)}` })
     },
     [signal, toast],
   )
@@ -297,7 +295,7 @@ function useStoreValue() {
   const mute = useCallback(
     (id: VibeId) => {
       signal('mute', { [id]: 1 })
-      toast({ tone: 'info', title: `${labelOf(id)} muted`, body: 'Unmute any time from your profile.' })
+      toast({ tone: 'info', title: `${labelOf(id)} hidden`, body: 'You can undo this from your profile.' })
     },
     [signal, toast],
   )
@@ -331,7 +329,6 @@ function useStoreValue() {
       const unlockedAll: VibeId[] = []
       const events = [
         ...input.vibes.map((id) => ({ tags: { [id]: 1 }, strength: 1 })),
-        ...input.pairs.map((tags) => ({ tags, strength: 0.5 })),
         ...(input.mentor ? [{ tags: MENTORS.find((m) => m.id === input.mentor)!.tags, strength: 0.5 }] : []),
       ]
       for (const e of events) {
@@ -339,7 +336,7 @@ function useStoreValue() {
         profile = res.profile
         unlockedAll.push(...res.unlocked)
       }
-      update((s) => ({ ...s, onboarded: true, handle: input.handle.trim(), mentor: input.mentor, profile: takeSnapshot({ ...profile, snapshot: {} }), shown: [] }))
+      update((s) => ({ ...s, onboarded: true, mentor: input.mentor, profile: takeSnapshot({ ...profile, snapshot: {} }), shown: [] }))
       // Unlocks from onboarding appear at the top of the first feed.
       pendingUnlocks.current = unlockedAll
       setFeed([])

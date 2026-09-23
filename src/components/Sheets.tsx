@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { ArrowUpRight, Check, MapPin, Store } from 'lucide-react'
-import { mostSimilar, VIBES, labelOf, VIBE_BY_ID } from '../engine'
+import { ChevronRight } from 'lucide-react'
+import { mostSimilar, VIBES, labelOf } from '../engine'
 import { CATALOG, FITS, FIND_BY_ID, FINDS, SHOP_BY_ID } from '../data/catalog'
 import type { FindItem } from '../data/types'
 import { useStore } from '../state/store'
@@ -17,22 +17,30 @@ export function Sheets() {
       return <ItemSheet key={ui.sheet.id} id={ui.sheet.id} />
     case 'shop':
       return <ShopSheet key={ui.sheet.id} id={ui.sheet.id} />
-    case 'scout':
-      return <ScoutSheet />
+    case 'suggest':
+      return <SuggestSheet />
     default:
       return null
   }
 }
 
-function MiniFind({ f }: { f: FindItem }) {
+function Shelf({ title, finds }: { title: string; finds: FindItem[] }) {
   const ui = useUI()
   const store = useStore()
+  if (!finds.length) return null
   return (
-    <button className="group flex w-[132px] shrink-0 flex-col gap-1.5 text-left" onClick={() => (store.track('open', f), ui.open({ kind: 'item', id: f.id }))}>
-      <ObjectArt art={f.art} className="block aspect-square w-full rounded-[10px]" />
-      <span className="line-clamp-2 text-[13px] leading-snug font-medium group-hover:underline">{f.name}</span>
-      <span className="tnum font-mono text-[12px] text-ink-2">{money(f.price)}</span>
-    </button>
+    <section className="mt-8">
+      <h3 className="t-headline">{title}</h3>
+      <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-1">
+        {finds.map((f) => (
+          <button key={f.id} className="flex w-[136px] shrink-0 flex-col gap-1.5 text-left" onClick={() => (store.track('open', f), ui.open({ kind: 'item', id: f.id }))}>
+            <ObjectArt art={f.art} className="block aspect-square w-full rounded-[14px]" />
+            <span className="t-foot line-clamp-2 font-medium">{f.name}</span>
+            <span className="t-foot text-ink-2">{money(f.price)}</span>
+          </button>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -45,90 +53,55 @@ function ItemSheet({ id }: { id: string }) {
   const fromShop = FINDS.filter((f) => f.shop === item.shop && f.id !== item.id).slice(0, 6)
   const similar = mostSimilar(item, CATALOG, new Set(store.hidden), 8, ['find']) as FindItem[]
   const inFits = FITS.filter((f) => f.findIds.includes(item.id))
-  const vibes = Object.entries(item.tags)
-    .filter(([v]) => v in VIBE_BY_ID)
-    .sort((a, b) => b[1] - a[1])
-    .map(([v]) => v)
 
   return (
     <Sheet onClose={ui.close} label={item.name}>
-      <div className="hang-tag overflow-hidden">
-        <ObjectArt art={item.art} className="block aspect-[4/3] w-full" />
+      <div className="relative overflow-hidden rounded-[20px]">
+        <ObjectArt art={item.art} className="block aspect-square w-full" />
+        {item.sponsored && <span className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[12px] font-semibold text-white">Partner</span>}
       </div>
-      <div className="mt-4 flex items-start justify-between gap-3">
-        <div>
-          <div className="eyebrow tnum">N° {String(item.no).padStart(4, '0')}{item.sponsored ? ' · Partner' : ''}</div>
-          <h2 className="display mt-1 text-[34px]">{item.name}</h2>
-        </div>
-        <span className="tnum mt-5 shrink-0 rounded-md border border-line px-2 py-1 font-mono text-[16px] font-medium">{money(item.price)}</span>
-      </div>
-      <p className="mt-2 text-[15.5px] leading-relaxed text-ink-2">{item.blurb}</p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {vibes.map((v) => (
-          <span key={v} className="chip !py-1 !text-[12px]">
-            {labelOf(v)}
-          </span>
-        ))}
-      </div>
-      <button className="btn btn-accent mt-5 w-full !py-3" onClick={() => (store.shopClick(item), ui.open({ kind: 'shop', id: item.id }))}>
-        Shop at {shop.name} <ArrowUpRight size={17} />
+      <h2 className="t-title mt-5">{item.name}</h2>
+      <p className="t-sub mt-1 text-ink-2">
+        {shop.name} · {shop.location}
+      </p>
+      <p className="t-title2 mt-3">{money(item.price)}</p>
+      <p className="mt-2 text-ink-2">{item.blurb}</p>
+      <button className="btn btn-primary btn-large mt-5 w-full" onClick={() => (store.shopClick(item), ui.open({ kind: 'shop', id: item.id }))}>
+        Shop at {shop.name}
       </button>
-      <div className="-mx-2 mt-2">
+      <div className="mt-2">
         <CardActions item={item} />
       </div>
 
-      <section className="mt-6 rounded-[14px] border border-line p-4">
-        <div className="flex items-center gap-2 text-[15px] font-semibold">
-          <Store size={16} /> {shop.name}
-        </div>
-        <p className="mt-1 text-[14px] text-ink-2">{shop.blurb}</p>
-        <p className="mt-1 flex items-center gap-1 text-[13px] text-ink-3">
-          <MapPin size={13} /> {shop.location}
-        </p>
+      <section className="mt-6 rounded-[14px] bg-surface px-4 py-3.5">
+        <p className="t-headline">About {shop.name}</p>
+        <p className="t-sub mt-0.5 text-ink-2">{shop.blurb}</p>
       </section>
 
       {inFits.length > 0 && (
-        <section className="mt-6">
-          <h3 className="eyebrow mb-2">Styled in</h3>
-          <div className="flex flex-col gap-2">
+        <section className="mt-8">
+          <h3 className="t-headline">Wear it with</h3>
+          <div className="mt-3 flex flex-col">
             {inFits.map((fit) => (
-              <div key={fit.id} className="flex items-center gap-3 rounded-[12px] border border-line p-2">
-                <div className="grid w-16 shrink-0 grid-cols-2 gap-[2px] overflow-hidden rounded-[8px]">
+              <div key={fit.id} className="flex items-center gap-3 border-b-[0.5px] border-line py-3 last:border-b-0">
+                <div className="grid w-14 shrink-0 grid-cols-2 gap-px overflow-hidden rounded-[10px]">
                   {fit.findIds.map((fid) => (
                     <ObjectArt key={fid} art={FIND_BY_ID[fid].art} className="block aspect-square w-full" />
                   ))}
                 </div>
-                <div>
-                  <div className="display text-[20px]">{fit.name}</div>
-                  <div className="text-[13px] text-ink-2">{fit.blurb}</div>
+                <div className="min-w-0 flex-1">
+                  <p className="t-headline">{fit.name}</p>
+                  <p className="t-foot text-ink-2">{fit.blurb}</p>
                 </div>
+                <ChevronRight size={18} className="shrink-0 text-ink-3" />
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {fromShop.length > 0 && (
-        <section className="mt-6">
-          <h3 className="eyebrow mb-2">More from {shop.name}</h3>
-          <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-            {fromShop.map((f) => (
-              <MiniFind key={f.id} f={f} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {similar.length > 0 && (
-        <section className="mt-6">
-          <h3 className="eyebrow mb-2">Same energy</h3>
-          <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-            {similar.map((f) => (
-              <MiniFind key={f.id} f={f} />
-            ))}
-          </div>
-        </section>
-      )}
+      <Shelf title={`More from ${shop.name}`} finds={fromShop} />
+      <Shelf title="You might also like" finds={similar} />
     </Sheet>
   )
 }
@@ -139,38 +112,26 @@ function ShopSheet({ id }: { id: string }) {
   if (!item) return null
   const shop = SHOP_BY_ID[item.shop]
   return (
-    <Sheet onClose={ui.close} label={`Heading to ${shop.name}`}>
-      <div className="flex items-center gap-4">
-        <ObjectArt art={item.art} className="block size-20 shrink-0 rounded-[12px]" />
-        <div>
-          <div className="eyebrow">Heading to</div>
-          <h2 className="display text-[34px]">{shop.name}</h2>
-          <p className="text-[14px] text-ink-2">
-            {item.name} · <span className="tnum font-mono">{money(item.price)}</span>
-          </p>
-        </div>
-      </div>
-      <div className="mt-5 rounded-[14px] border border-dashed border-line bg-surface p-4 text-[14px] leading-relaxed text-ink-2">
-        <p>
-          <strong className="text-ink">Prototype:</strong> {shop.name} is a sample shop. In the live app this button opens the shop's product page through a
-          tracked link. You buy straight from them; NicheNotes earns a small commission and the shop sees the sale came from here.
+    <Sheet onClose={ui.close} label={`Go to ${shop.name}`}>
+      <div className="flex flex-col items-center pt-2 text-center">
+        <ObjectArt art={item.art} className="block size-28 rounded-[20px]" />
+        <h2 className="t-title mt-5">Go to {shop.name}</h2>
+        <p className="t-sub mt-1 text-ink-2">
+          {item.name} · {money(item.price)}
         </p>
+        <p className="t-sub mt-5 max-w-[34ch] text-ink-2">
+          In the live app, this opens {shop.name}'s website. You buy directly from them, and NicheNotes earns a small commission at no cost to you.
+        </p>
+        <p className="t-foot mt-3 text-ink-3">This is a preview. {shop.name} is a sample shop.</p>
+        <button className="btn btn-primary btn-large mt-7 w-full" onClick={ui.close}>
+          Done
+        </button>
       </div>
-      <div className="mt-4 grid gap-2 text-[14px]">
-        {['You pay the shop directly. No markup.', 'We learned something: shopping is the strongest signal your feed gets.', 'Shops that sell well here can apply to become Partners.'].map((t) => (
-          <div key={t} className="flex gap-2">
-            <Check size={16} className="mt-0.5 shrink-0 text-accent" /> {t}
-          </div>
-        ))}
-      </div>
-      <button className="btn mt-6 w-full !py-3" onClick={ui.close}>
-        Back to the feed
-      </button>
     </Sheet>
   )
 }
 
-function ScoutSheet() {
+function SuggestSheet() {
   const ui = useUI()
   const store = useStore()
   const [name, setName] = useState('')
@@ -181,20 +142,18 @@ function ScoutSheet() {
   const valid = name.trim().length > 1 && vibe && why.trim().length > 4
 
   return (
-    <Sheet onClose={ui.close} label="Scout a find">
+    <Sheet onClose={ui.close} label="Suggest a find">
       {sent ? (
-        <div className="py-6 text-center">
-          <div className="display text-[40px]">Nice find.</div>
-          <p className="mx-auto mt-2 max-w-sm text-[15px] text-ink-2">
-            It goes to the {labelOf(vibe)} crew for a vote. If it gets saved enough, it goes live and you get Scout credit on it.
-          </p>
-          <button className="btn mt-6" onClick={ui.close}>
+        <div className="py-8 text-center">
+          <h2 className="t-title">Thanks.</h2>
+          <p className="mx-auto mt-2 max-w-[34ch] text-ink-2">The {labelOf(vibe)} community will take a look. If people save it, it goes live with your name on it.</p>
+          <button className="btn btn-primary btn-large mt-7 w-full" onClick={ui.close}>
             Done
           </button>
         </div>
       ) : (
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           onSubmit={(e) => {
             e.preventDefault()
             if (!valid) return
@@ -203,22 +162,21 @@ function ScoutSheet() {
           }}
         >
           <div>
-            <div className="eyebrow">Scout a find</div>
-            <h2 className="display mt-1 text-[34px]">Know something nobody's heard of?</h2>
-            <p className="mt-1 text-[14px] text-ink-2">The best finds come from you. Scouts earn a cut when their find sells (coming soon).</p>
+            <h2 className="t-title">Suggest a find</h2>
+            <p className="mt-1 text-ink-2">Know something great that nobody has heard of? Share it.</p>
           </div>
-          <label className="flex flex-col gap-1 text-[13px] font-medium" htmlFor="scout-name">
+          <label className="t-foot flex flex-col gap-1.5 font-semibold text-ink-2" htmlFor="suggest-name">
             What is it?
-            <input id="scout-name" className="rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[15px] font-normal" placeholder="e.g. Hand-dyed indigo bandana" value={name} onChange={(e) => setName(e.target.value)} />
+            <input id="suggest-name" className="field font-normal" placeholder="Hand-dyed indigo bandana" value={name} onChange={(e) => setName(e.target.value)} />
           </label>
-          <label className="flex flex-col gap-1 text-[13px] font-medium" htmlFor="scout-link">
-            Where can you get it? <span className="font-normal text-ink-3">(optional)</span>
-            <input id="scout-link" className="rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[15px] font-normal" placeholder="Shop link or @handle" value={link} onChange={(e) => setLink(e.target.value)} />
+          <label className="t-foot flex flex-col gap-1.5 font-semibold text-ink-2" htmlFor="suggest-link">
+            Where can people get it? (optional)
+            <input id="suggest-link" className="field font-normal" placeholder="Website or social handle" value={link} onChange={(e) => setLink(e.target.value)} />
           </label>
-          <label className="flex flex-col gap-1 text-[13px] font-medium" htmlFor="scout-vibe">
-            Which vibe?
-            <select id="scout-vibe" className="rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[15px] font-normal" value={vibe} onChange={(e) => setVibe(e.target.value)}>
-              <option value="">Pick one</option>
+          <label className="t-foot flex flex-col gap-1.5 font-semibold text-ink-2" htmlFor="suggest-vibe">
+            Category
+            <select id="suggest-vibe" className="field font-normal" value={vibe} onChange={(e) => setVibe(e.target.value)}>
+              <option value="">Choose one</option>
               {VIBES.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.label}
@@ -226,12 +184,12 @@ function ScoutSheet() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-[13px] font-medium" htmlFor="scout-why">
-            Why is it good?
-            <textarea id="scout-why" rows={3} className="rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[15px] font-normal" placeholder="Sell it to the crew in a sentence." value={why} onChange={(e) => setWhy(e.target.value)} />
+          <label className="t-foot flex flex-col gap-1.5 font-semibold text-ink-2" htmlFor="suggest-why">
+            Why is it great?
+            <textarea id="suggest-why" rows={3} className="field font-normal" placeholder="One sentence is enough." value={why} onChange={(e) => setWhy(e.target.value)} />
           </label>
-          <button className="btn btn-accent !py-3" disabled={!valid} type="submit">
-            Submit to the crew
+          <button className="btn btn-primary btn-large" disabled={!valid} type="submit">
+            Submit
           </button>
         </form>
       )}

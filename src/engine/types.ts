@@ -14,7 +14,7 @@ export interface CatalogItem {
   popularity: number
   /** Paid partner placement. Only ever shown when it matches the viewer. */
   sponsored?: boolean
-  /** Items from the same source (shop, crew) are spaced apart in the feed. */
+  /** Items from the same source (shop, club) are spaced apart in the feed. */
   source?: string
 }
 

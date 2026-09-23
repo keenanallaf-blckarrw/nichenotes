@@ -25,29 +25,29 @@ function batch(profile: Profile, opts: { shown?: string[]; exclude?: string[]; s
 }
 
 describe('profile learning', () => {
-  it('unlocks blokecore when football meets vintage', () => {
+  it('unlocks retro jerseys when soccer meets vintage', () => {
     const { profile, unlocked } = applyEvent(emptyProfile(NOW), { kind: 'seed', tags: { soccer: 1, vintage: 1 } }, NOW)
-    expect(unlocked).toContain('blokecore')
-    expect(profile.unlocked).toContain('blokecore')
+    expect(unlocked).toContain('retrojerseys')
+    expect(profile.unlocked).toContain('retrojerseys')
   })
 
   it('does not unlock a combo from one half alone', () => {
     const { unlocked } = applyEvent(emptyProfile(NOW), { kind: 'seed', tags: { soccer: 1 } }, NOW)
-    expect(unlocked).not.toContain('blokecore')
+    expect(unlocked).not.toContain('retrojerseys')
   })
 
   it('reports an unlock only once', () => {
     const first = applyEvent(emptyProfile(NOW), { kind: 'seed', tags: { soccer: 1, vintage: 1 } }, NOW)
     const second = applyEvent(first.profile, { kind: 'save', tags: { soccer: 1, vintage: 1 } }, NOW)
-    expect(second.unlocked).not.toContain('blokecore')
+    expect(second.unlocked).not.toContain('retrojerseys')
   })
 
-  it('discovers retro kits through behaviour, not only onboarding', () => {
-    // Picked football at onboarding, then kept saving vintage things.
+  it('discovers retro jerseys through behavior, not only onboarding', () => {
+    // Picked soccer at onboarding, then kept saving vintage things.
     let p = seeded({ soccer: 1 })
     const jacket = FIND_BY_ID['f-workjacket']
     for (let i = 0; i < 3; i++) p = applyEvent(p, { kind: 'save', tags: jacket.tags, itemType: 'find' }, NOW).profile
-    expect(p.unlocked).toContain('blokecore')
+    expect(p.unlocked).toContain('retrojerseys')
   })
 
   it('"not for me" pushes a vibe negative', () => {
@@ -68,21 +68,21 @@ describe('profile learning', () => {
 })
 
 describe('ranking', () => {
-  it('leads a blokecore profile with football and vintage', () => {
+  it('leads a retro-jersey profile with soccer and vintage', () => {
     const top = batch(seeded({ soccer: 1, vintage: 1 })).slice(0, 4)
     for (const r of top.filter((r) => r.reason.kind !== 'explore')) {
       expect(relevance(r.item.tags, effectiveAffinity(seeded({ soccer: 1, vintage: 1 })))).toBeGreaterThan(0)
     }
-    expect(top.some((r) => (r.item.tags.blokecore ?? 0) > 0 || (r.item.tags.soccer ?? 0) > 0)).toBe(true)
+    expect(top.some((r) => (r.item.tags.retrojerseys ?? 0) > 0 || (r.item.tags.soccer ?? 0) > 0)).toBe(true)
   })
 
-  it('surfaces a retro kit in the first batch for a blokecore profile', () => {
+  it('surfaces a retro jersey in the first batch for that profile', () => {
     const items = batch(seeded({ soccer: 1, vintage: 1 }))
-    expect(items.some((r) => r.item.type === 'find' && (r.item.tags.blokecore ?? 0) >= 0.9)).toBe(true)
+    expect(items.some((r) => r.item.type === 'find' && (r.item.tags.retrojerseys ?? 0) >= 0.9)).toBe(true)
   })
 
   it('never shows excluded (hidden) items', () => {
-    const exclude = ['f-hoops', 'f-keeper', 'q-simplefootball']
+    const exclude = ['f-striped', 'f-keeper', 'q-quality']
     const items = batch(seeded({ soccer: 1, vintage: 1 }), { exclude })
     expect(items.map((r) => r.item.id)).not.toEqual(expect.arrayContaining(exclude))
   })
@@ -103,7 +103,7 @@ describe('ranking', () => {
     for (const r of explore) expect(eff[r.reason.tags[0]] ?? 0).toBeLessThan(0.3)
   })
 
-  it('prefers exploring neighbours of what you love', () => {
+  it('prefers exploring neighbors of what you love', () => {
     const items = batch(seeded({ soccer: 1, vintage: 1 }))
     const anchored = items.filter((r) => r.reason.kind === 'explore' && r.reason.tags[1])
     expect(anchored.length).toBeGreaterThan(0)
@@ -163,8 +163,8 @@ describe('ranking', () => {
 })
 
 describe('similar items', () => {
-  it('finds other retro kits for a retro kit', () => {
-    const sims = mostSimilar(FIND_BY_ID['f-hoops'], CATALOG, new Set(), 3, ['find'])
+  it('finds other retro jerseys for a retro jersey', () => {
+    const sims = mostSimilar(FIND_BY_ID['f-striped'], CATALOG, new Set(), 3, ['find'])
     expect(sims.length).toBeGreaterThan(0)
     for (const s of sims) expect(s.tags.soccer ?? 0).toBeGreaterThan(0)
   })
@@ -173,15 +173,15 @@ describe('similar items', () => {
 describe('explanations', () => {
   it('names the combo recipe for combo picks', () => {
     const p = seeded({ soccer: 1, vintage: 1 })
-    expect(explain({ kind: 'combo', combo: 'blokecore', tags: ['soccer'] }, p)).toBe('Blokecore pick · Football × Vintage')
+    expect(explain({ kind: 'combo', combo: 'retrojerseys', tags: ['soccer'] }, p)).toBe('Retro Jerseys · Soccer + Vintage')
   })
 
-  it('reads a blokecore profile as a blokecore guy', () => {
+  it('summarizes a profile by its top interests', () => {
     const p = seeded({ soccer: 1, vintage: 1, stoicism: 0.6 })
-    expect(vibeRead(p).headline).toMatch(/^Blokecore guy/)
+    expect(vibeRead(p).headline).toBe('Soccer, Vintage and Stoicism')
   })
 
   it('handles an empty profile', () => {
-    expect(vibeRead(emptyProfile(NOW)).headline).toBe('Still reading your vibe')
+    expect(vibeRead(emptyProfile(NOW)).headline).toBe('Still learning your taste')
   })
 })

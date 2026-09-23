@@ -1,10 +1,16 @@
 # NicheNotes
 
-A For You feed for guys that learns your vibe and leads you to unknown, good stuff: niche finds and fits from small shops, words worth keeping (Caesar, Marcus Aurelius, Cruyff…), daily rituals, and crews of people into the same things.
+A For You feed for guys that learns your taste and leads you to great things nobody has heard of yet. You get:
+
+- products and outfits from small shops
+- quotes worth keeping (Steve Jobs, Marcus Aurelius, Caesar…)
+- daily habits
+- clubs of people into the same things
 
 This is a **working prototype**: a phone-first web app with a real recommendation engine, sample data and no backend. Everything a user does is stored on their device.
 
-See [`docs/PRODUCT.md`](docs/PRODUCT.md) for the product vision, business model and roadmap.
+- [`docs/PRODUCT.md`](docs/PRODUCT.md): product vision, business model and roadmap.
+- [`docs/DESIGN.md`](docs/DESIGN.md): the design principles (after Steve Jobs) and the token system.
 
 ## Run it
 
@@ -21,21 +27,35 @@ npm run build      # typecheck + production build to dist/
 
 ```
 src/
-  engine/        The vibe engine. Pure TypeScript, no React, fully unit-tested.
-    taxonomy.ts    22 vibes in 6 worlds, plus 9 combo subcultures (e.g. Blokecore)
-    profile.ts     Learning: signal weights, decay, combo unlocks
+  engine/        The recommendation engine. Pure TypeScript, no React, fully unit-tested.
+    taxonomy.ts    22 interests in 6 groups, plus 9 unlockable combinations (e.g. Retro Jerseys)
+    profile.ts     Learning: signal weights, decay, unlocks
     rank.ts        Feed ranking: relevance, variety, exploration, partner slots
-    explain.ts     "Why am I seeing this?" lines and the written vibe read
-  data/          Sample catalog: quotes (with sources), shops, finds, fits, crews, posts, rituals
+    explain.ts     "Why am I seeing this?" lines and the taste summary
+  data/          Sample catalog: quotes (with sources), shops, finds, outfits, clubs, posts, daily habits
   state/         App state (React context) and local persistence
-  components/    Cards, sheets, the app shell, drawn product art
-  pages/         Onboarding, For You, Discover, vibe pages, Crews, profile, For Brands
+  components/    Cards, sheets, the app shell, drawn product images
+  pages/         Onboarding, For You, Discover, interest pages, Clubs, You, For brands
 ```
 
 ## How the feed learns
 
-Likes, saves, shop taps and time spent push a vibe up; "Not for me" pushes it down; mute removes it; anything ignored fades with a 30-day half-life. When two interests overlap strongly enough, a subculture unlocks: Football × Vintage becomes **Blokecore**, and retro kits start showing up. Two slots in every ten explore new vibes, and one can go to a paid partner, but only if the product genuinely matches you. Details in `docs/PRODUCT.md`.
+These actions push an interest up:
+
+- likes
+- saves
+- shop taps
+- time spent
+
+"Not interested" pushes an interest down, and hiding it removes it. Anything you ignore fades with a 30-day half-life.
+
+When two interests overlap strongly enough, a new one unlocks. For example, Soccer + Vintage becomes **Retro Jerseys**, and retro jerseys start showing up.
+
+In every ten items:
+
+- two slots explore interests you haven't tried yet
+- one slot can go to a paid partner, but only if the product genuinely matches you
 
 ## Sample data
 
-Shops, products, handles and posts are invented for the prototype. Quotes are real and carry their sources; lines that are only popularly credited are marked "attributed".
+Shops, products, usernames and posts are invented for the prototype. Quotes are real and carry their sources; lines that are only popularly credited are marked "Attributed".

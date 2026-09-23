@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bookmark, EyeOff, Heart, MoreHorizontal, Send, VolumeX } from 'lucide-react'
+import { Bookmark, EyeOff, Heart, Info, MoreHorizontal, Share, VolumeX } from 'lucide-react'
 import { labelOf, VIBE_BY_ID } from '../../engine'
 import type { AnyItem } from '../../data/types'
 import { useStore } from '../../state/store'
@@ -10,10 +10,12 @@ function primaryVibe(item: AnyItem): string | undefined {
     .sort((a, b) => b[1] - a[1])[0]?.[0]
 }
 
-export function CardActions({ item, likes, tone = 'default' }: { item: AnyItem; likes?: number; tone?: 'default' | 'slab' }) {
+/** Like and save up front; everything else lives in the ••• menu. */
+export function CardActions({ item, likes, why }: { item: AnyItem; likes?: number; why?: string }) {
   const store = useStore()
   const [menu, setMenu] = useState(false)
-  const [shared, setShared] = useState(false)
+  const [showWhy, setShowWhy] = useState(false)
+  const [copied, setCopied] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const liked = store.liked.includes(item.id)
   const saved = store.saved.includes(item.id)
@@ -21,50 +23,55 @@ export function CardActions({ item, likes, tone = 'default' }: { item: AnyItem; 
 
   useEffect(() => {
     if (!menu) return
-    const close = (e: PointerEvent) => !menuRef.current?.contains(e.target as Node) && setMenu(false)
+    const close = (e: PointerEvent) => !menuRef.current?.contains(e.target as Node) && (setMenu(false), setShowWhy(false))
     window.addEventListener('pointerdown', close)
     return () => window.removeEventListener('pointerdown', close)
   }, [menu])
 
   const share = async () => {
     store.track('share', item)
-    const text = item.type === 'quote' ? `"${item.translation ?? item.text}" — ${item.author}` : 'Found this on NicheNotes'
+    const text = item.type === 'quote' ? `"${item.translation ?? item.text}" (${item.author})` : 'Found this on NicheNotes'
     try {
       await navigator.clipboard.writeText(text)
     } catch {
-      /* clipboard can be refused; the share still counts as a signal */
+      /* Clipboard can be refused; the share still counts as a signal. */
     }
-    setShared(true)
-    setTimeout(() => setShared(false), 1600)
+    setCopied(true)
+    setTimeout(() => (setCopied(false), setMenu(false)), 1100)
   }
 
-  const cls = tone === 'slab' ? 'icon-btn !text-slab-ink-2 hover:!bg-white/10 hover:!text-slab-ink aria-pressed:!text-slab-ink' : 'icon-btn'
+  const row = 'flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[15px] hover:bg-surface-2'
 
   return (
-    <div className="relative flex items-center gap-1">
-      <button className={cls} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => store.toggleLike(item)}>
-        <Heart size={18} fill={liked ? 'currentColor' : 'none'} />
-        {likes !== undefined && <span>{likes + (liked ? 1 : 0)}</span>}
+    <div className="relative -mx-1.5 flex items-center gap-1">
+      <button className="icon-btn" aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => store.toggleLike(item)}>
+        <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
+        {likes !== undefined && <span>{compactLikes(likes + (liked ? 1 : 0))}</span>}
       </button>
-      <button className={cls} aria-pressed={saved} aria-label={saved ? 'Remove from Stash' : 'Save to Stash'} onClick={() => store.toggleSave(item)}>
-        <Bookmark size={18} fill={saved ? 'currentColor' : 'none'} />
-      </button>
-      <button className={cls} aria-label="Share" onClick={share}>
-        <Send size={17} />
-        {shared && <span className="text-xs">Copied</span>}
+      <button className="icon-btn" aria-pressed={saved} aria-label={saved ? 'Remove from Saved' : 'Save'} onClick={() => store.toggleSave(item)}>
+        <Bookmark size={20} fill={saved ? 'currentColor' : 'none'} />
       </button>
       <div ref={menuRef} className="ml-auto">
-        <button className={cls} aria-label="More options" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
-          <MoreHorizontal size={18} />
+        <button className="icon-btn" aria-label="More" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
+          <MoreHorizontal size={20} />
         </button>
         {menu && (
-          <div className="anim-fade absolute right-0 bottom-10 z-20 w-56 overflow-hidden rounded-xl border border-line bg-surface text-sm text-ink shadow-lg">
-            <button className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-surface-2" onClick={() => (setMenu(false), store.hide(item))}>
-              <EyeOff size={16} /> Not for me
+          <div className="anim-fade absolute right-0 bottom-11 z-20 w-64 overflow-hidden rounded-[14px] bg-surface text-ink shadow-[0_8px_40px_rgb(0_0_0/0.18)]">
+            {why && (
+              <button className={row} onClick={() => setShowWhy((v) => !v)} aria-expanded={showWhy}>
+                Why am I seeing this? <Info size={17} className="text-ink-2" />
+              </button>
+            )}
+            {why && showWhy && <p className="px-4 pb-3 text-[13px] text-ink-2">{why}</p>}
+            <button className={`${row} border-t-[0.5px] border-line`} onClick={share}>
+              {copied ? 'Copied' : 'Share'} <Share size={17} className="text-ink-2" />
+            </button>
+            <button className={`${row} border-t-[0.5px] border-line`} onClick={() => (setMenu(false), store.hide(item))}>
+              Not interested <EyeOff size={17} className="text-ink-2" />
             </button>
             {vibe && (
-              <button className="flex w-full items-center gap-2 border-t border-line px-3 py-2.5 text-left hover:bg-surface-2" onClick={() => (setMenu(false), store.mute(vibe))}>
-                <VolumeX size={16} /> Mute {labelOf(vibe)}
+              <button className={`${row} border-t-[0.5px] border-line`} onClick={() => (setMenu(false), store.mute(vibe))}>
+                Hide all {labelOf(vibe)} <VolumeX size={17} className="text-ink-2" />
               </button>
             )}
           </div>
@@ -72,4 +79,8 @@ export function CardActions({ item, likes, tone = 'default' }: { item: AnyItem; 
       </div>
     </div>
   )
+}
+
+function compactLikes(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n)
 }

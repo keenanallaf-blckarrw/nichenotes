@@ -1,117 +1,112 @@
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Check } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { PARTNER_MIN_RELEVANCE } from '../engine'
-import { SectionTitle } from '../components/bits'
+import { PageTitle, SectionHeader } from '../components/bits'
 
 // Illustrative numbers for a sample partner, to show what a brand would see.
 const SAMPLE = {
-  shop: 'Terrace Archive',
+  shop: 'Final Whistle Archive',
   period: 'Last 30 days',
   tiles: [
-    { label: 'Matched impressions', value: '48.2K', delta: '+18% vs prior 30 days' },
-    { label: 'Click-outs to your store', value: '3,914', delta: '+24% vs prior 30 days' },
-    { label: 'Click-out rate', value: '8.1%', delta: 'Feed average 2.3%' },
-    { label: 'Attributed sales', value: '$11.6K', delta: '171 orders' },
+    { label: 'People reached', value: '48.2K', note: 'Up 18% from the 30 days before' },
+    { label: 'Visits to your store', value: '3,914', note: 'Up 24% from the 30 days before' },
+    { label: 'Visit rate', value: '8.1%', note: 'Average on NicheNotes: 2.3%' },
+    { label: 'Sales from NicheNotes', value: '$11.6K', note: '171 orders' },
   ],
-  vibes: [
-    { label: 'Blokecore', share: 0.46 },
-    { label: 'Football', share: 0.27 },
+  interests: [
+    { label: 'Retro Jerseys', share: 0.46 },
+    { label: 'Soccer', share: 0.27 },
     { label: 'Vintage', share: 0.14 },
-    { label: 'Groundhopper', share: 0.08 },
+    { label: 'Stadium Travel', share: 0.08 },
     { label: 'Streetwear', share: 0.05 },
   ],
 }
 
 const STEPS = [
-  { title: 'List your products', body: 'Connect your store or upload a feed. We tag every product into our vibe map automatically; you approve the tags.' },
-  { title: 'We match, not blast', body: 'Your products only reach people whose learned vibe fits. A retro kit shop reaches Blokecore guys, not everyone.' },
-  { title: 'Pay for results', body: 'Organic listing is free. Partner placement is pay-per-click-out or a cut of the sale. No impressions you did not ask for.' },
+  { title: 'Add your products', body: 'Connect your store. We sort each product into the right interests, and you approve it.' },
+  { title: 'Reach the right people', body: 'Your products only appear for people whose taste matches. A jersey shop reaches soccer fans who love vintage, not everyone.' },
+  { title: 'Pay for results', body: 'Listing is free. Partner placement is paid per store visit or as a share of each sale.' },
 ]
 
 const RULES = [
-  'Partner posts are always labelled Partner.',
-  `A partner item only shows when it scores at least ${Math.round(PARTNER_MIN_RELEVANCE * 100)}/100 on the viewer's vibe match.`,
-  'At most one partner slot in every ten posts.',
-  'Brands see aggregated vibes, never individual people.',
-  '"Not for me" on a partner post counts against its match score.',
+  'Partner posts are always labeled.',
+  `A partner post only appears when it scores at least ${Math.round(PARTNER_MIN_RELEVANCE * 100)} out of 100 on how well it matches the person.`,
+  'No more than one partner post in every ten.',
+  'Brands see totals by interest, never individual people.',
+  'When someone taps "Not interested" on a partner post, its match score goes down.',
 ]
 
 export function Brands() {
-  const max = Math.max(...SAMPLE.vibes.map((v) => v.share))
+  const max = Math.max(...SAMPLE.interests.map((v) => v.share))
   return (
-    <div className="flex flex-col gap-10 pt-6">
-      <Link to="/me" className="flex items-center gap-1 text-[14px] text-ink-2 hover:text-ink">
-        <ArrowLeft size={16} /> Back
+    <div>
+      <Link to="/me" className="t-sub -ml-1 flex items-center pt-5 text-accent-text">
+        <ChevronLeft size={22} /> You
       </Link>
-      <header>
-        <div className="eyebrow">For brands</div>
-        <h1 className="display mt-2 text-[56px] sm:text-[68px]">Get found by the guys who'd actually buy it.</h1>
-        <p className="mt-3 max-w-[52ch] text-[16px] leading-relaxed text-ink-2">
-          NicheNotes is where people come to find what TikTok hasn't flattened yet. If you make something small, specific and good, this is your shelf.
-        </p>
-      </header>
+      <PageTitle title="For brands" />
+      <p className="t-title2 mt-2 font-normal text-ink-2">Reach the people who actually want what you make.</p>
 
-      <section>
-        <SectionTitle eyebrow="How it works" title="Three steps" />
-        <ol className="mt-4 flex flex-col gap-3">
+      <section className="mt-12">
+        <SectionHeader title="How it works" />
+        <ol className="mt-4 flex flex-col gap-5">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="flex gap-4 rounded-[14px] border border-line bg-surface p-4">
-              <span className="display text-[34px] text-accent">{i + 1}</span>
-              <div>
-                <div className="text-[16px] font-semibold">{s.title}</div>
-                <p className="mt-0.5 text-[14px] text-ink-2">{s.body}</p>
-              </div>
+            <li key={s.title} className="flex gap-4">
+              <span className="t-headline flex size-8 shrink-0 items-center justify-center rounded-full bg-surface text-ink-2">{i + 1}</span>
+              <span>
+                <span className="t-headline block">{s.title}</span>
+                <span className="t-sub block text-ink-2">{s.body}</span>
+              </span>
             </li>
           ))}
         </ol>
       </section>
 
-      <section>
-        <SectionTitle eyebrow="Sample dashboard" title={SAMPLE.shop} action={<span className="font-mono text-[11px] text-ink-3">{SAMPLE.period}</span>} />
-        <p className="mt-1 text-[13px] text-ink-3">Illustrative figures for a sample partner.</p>
+      <section className="mt-12">
+        <SectionHeader title="What you'd see" />
+        <p className="t-foot mt-1 text-ink-2">
+          {SAMPLE.shop}, {SAMPLE.period.toLowerCase()}. Sample numbers.
+        </p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           {SAMPLE.tiles.map((t) => (
-            <div key={t.label} className="rounded-[14px] border border-line bg-surface p-4">
-              <div className="text-[13px] text-ink-2">{t.label}</div>
-              <div className="mt-1 text-[30px] leading-none font-semibold">{t.value}</div>
-              <div className="mt-2 text-[12px] text-ink-3">{t.delta}</div>
+            <div key={t.label} className="rounded-[16px] bg-surface p-4">
+              <p className="t-foot text-ink-2">{t.label}</p>
+              <p className="mt-1 text-[28px] leading-none font-semibold tracking-[-0.02em]">{t.value}</p>
+              <p className="t-foot mt-2 text-ink-3">{t.note}</p>
             </div>
           ))}
         </div>
-        <div className="mt-3 rounded-[14px] border border-line bg-surface p-4">
-          <div className="text-[14px] font-semibold">Who clicked through, by vibe</div>
-          <div className="mt-3 flex flex-col gap-2.5">
-            {SAMPLE.vibes.map((v) => (
-              <div key={v.label} className="grid grid-cols-[104px_1fr_40px] items-center gap-3" title={`${v.label}: ${Math.round(v.share * 100)}% of click-outs`}>
-                <span className="truncate text-[13px]">{v.label}</span>
-                <span className="h-2.5 rounded-full bg-accent-soft">
+        <div className="mt-2 rounded-[16px] bg-surface p-4">
+          <p className="t-headline">Store visits by interest</p>
+          <div className="mt-4 flex flex-col gap-3">
+            {SAMPLE.interests.map((v) => (
+              <div key={v.label} className="grid grid-cols-[112px_1fr_40px] items-center gap-3" title={`${v.label}: ${Math.round(v.share * 100)}% of store visits`}>
+                <span className="t-foot truncate">{v.label}</span>
+                <span className="h-1.5 rounded-full bg-accent-soft">
                   <span className="block h-full rounded-full bg-accent" style={{ width: `${(v.share / max) * 100}%` }} />
                 </span>
-                <span className="tnum text-right text-[13px] text-ink-2">{Math.round(v.share * 100)}%</span>
+                <span className="t-foot tnum text-right text-ink-2">{Math.round(v.share * 100)}%</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section>
-        <SectionTitle eyebrow="The deal with our users" title="Rules we don't break" />
-        <ul className="mt-4 flex flex-col gap-2.5">
+      <section className="mt-12">
+        <SectionHeader title="Our promise to users" />
+        <ul className="mt-3 overflow-hidden rounded-[14px] bg-surface">
           {RULES.map((r) => (
-            <li key={r} className="flex gap-2.5 text-[15px]">
-              <Check size={18} className="mt-0.5 shrink-0 text-accent" /> {r}
+            <li key={r} className="t-sub border-b-[0.5px] border-line px-4 py-3 last:border-b-0">
+              {r}
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[14px] text-ink-2">Trust is the product. If the feed starts feeling like ads, nobody comes back, and then nobody buys.</p>
+        <p className="t-sub mt-4 text-ink-2">Trust is the product. If the feed starts to feel like ads, people leave, and then nobody buys.</p>
       </section>
 
-      <section className="slab px-6 py-7">
-        <div className="relative z-[1]">
-          <div className="font-serif text-[28px] leading-tight italic">Founding partner spots are open.</div>
-          <p className="mt-2 text-[14px] text-slab-ink-2">First 100 brands get free partner placement for three months and a say in how the program works.</p>
-          <p className="mt-4 font-mono text-[12px] text-slab-ink-2">Prototype: no sign-up is wired up yet.</p>
-        </div>
+      <section className="mt-12 rounded-[20px] bg-surface px-5 py-6 text-center">
+        <h2 className="t-title2">Founding partners</h2>
+        <p className="t-sub mx-auto mt-1 max-w-[34ch] text-ink-2">The first 100 brands get free partner placement for three months.</p>
+        <p className="t-foot mt-3 text-ink-3">Preview version: sign-up isn't open yet.</p>
       </section>
     </div>
   )

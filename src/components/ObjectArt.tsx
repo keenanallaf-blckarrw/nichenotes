@@ -2,8 +2,8 @@ import { useId, type ReactNode } from 'react'
 import type { ArtSpec, ShirtPattern } from '../data/types'
 
 /**
- * Stand-in product imagery: each find is drawn as a simple object on a
- * coloured seamless, like a studio product shot. Real partner photos replace
+ * Stand-in product imagery: each find is drawn as a simple object on the same
+ * neutral background, like a studio product shot. Real partner photos replace
  * this once brands upload them.
  */
 export function ObjectArt({ art, className = '' }: { art: ArtSpec; className?: string }) {
@@ -11,9 +11,11 @@ export function ObjectArt({ art, className = '' }: { art: ArtSpec; className?: s
   const [bg, main, detail] = art.colors
   return (
     <svg viewBox="0 0 200 200" className={className} role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
-      <rect width="200" height="200" fill={bg} />
-      <ellipse cx="100" cy="174" rx="50" ry="5" fill="#000" opacity="0.08" />
-      <g transform="translate(100 102) scale(0.84) translate(-100 -100)">{draw(art, main, detail, bg, uid)}</g>
+      <rect width="200" height="200" style={{ fill: 'var(--tile)' }} />
+      <g transform="translate(100 102) scale(0.84) translate(-100 -100)">
+        <ellipse cx="100" cy="176" rx="58" ry="5" fill="#000" opacity="0.07" />
+        {draw(art, main, detail, bg, uid)}
+      </g>
     </svg>
   )
 }
@@ -23,7 +25,7 @@ const JACKET = 'M62 38 L86 30 L100 44 L114 30 L138 38 L166 70 L174 162 L154 164 
 
 function pattern(kind: ShirtPattern | undefined, detail: string): ReactNode {
   switch (kind) {
-    case 'hoops':
+    case 'bands':
       return [50, 90, 130].map((y) => <rect key={y} x="0" y={y} width="200" height="20" fill={detail} />)
     case 'stripes':
       return [52, 76, 100, 124, 148].map((x) => <rect key={x} x={x} y="0" width="12" height="200" fill={detail} />)

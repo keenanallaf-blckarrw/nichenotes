@@ -1,9 +1,9 @@
 import { FINDS, FIND_BY_ID, SHOPS, SHOP_BY_ID } from './finds'
 import { QUOTES, MENTORS } from './quotes'
-import { CREWS, CREW_BY_ID, FITS, POSTS, RITUALS } from './community'
+import { CLUBS, CLUB_BY_ID, FITS, POSTS, RITUALS } from './community'
 import type { AnyItem } from './types'
 
-export { FINDS, FIND_BY_ID, SHOPS, SHOP_BY_ID, QUOTES, MENTORS, CREWS, CREW_BY_ID, FITS, POSTS, RITUALS }
+export { FINDS, FIND_BY_ID, SHOPS, SHOP_BY_ID, QUOTES, MENTORS, CLUBS, CLUB_BY_ID, FITS, POSTS, RITUALS }
 
 export const CATALOG: AnyItem[] = [...QUOTES, ...FINDS, ...FITS, ...POSTS, ...RITUALS]
 
