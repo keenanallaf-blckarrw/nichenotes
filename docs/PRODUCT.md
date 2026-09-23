@@ -12,7 +12,7 @@ How it looks and reads is set by [`DESIGN.md`](DESIGN.md): Steve Jobs's principl
 
 The moat is **taste + trust**: an engine that actually gets you, and a feed that never feels like an ad catalog.
 
-## What the prototype does (v0.3)
+## What the prototype does (v0.4)
 
 | Feature | What it proves |
 |---|---|
@@ -25,7 +25,8 @@ The moat is **taste + trust**: an engine that actually gets you, and a feed that
 | "Why am I seeing this?" on every card, shown on the card only when the reason is interesting | Trust, and a differentiator vs TikTok |
 | A daily quote from themes you choose (philosophers, athletes, artists and writers, founders and scientists, leaders, mindfulness), always with its source | A reason to open the app every day, even when not shopping |
 | Daily habits and streaks | Wellness habit loop |
-| 50 clubs (communities) with posting | The social layer |
+| 51 clubs (communities) with posting | The social layer |
+| **Clubs near you:** choose an area and a radius, see pickup games and meetups on a radar and by day, RSVP, chat in each event's discussion, post "near me" questions, host your own | Online communities turn into real-life ones, which is what keeps people coming back |
 | Display settings: text size, light or dark, plus the device's own accessibility settings | Usable by more people, including anyone who needs larger text |
 | Suggest a find | Community-sourced supply |
 | Partner slots with hard rules + sample brand dashboard | How brands pay, without ruining the feed |
@@ -70,7 +71,7 @@ Everything is covered by unit tests (`npm test`).
   - written taste summaries
 
   Keep ranking behavioral; that's what makes For You pages work.
-- **Local layer (later):** run clubs, pickup soccer, barbers and vintage shops near you.
+- **Local shops (next):** the local layer is built for people; add independent shops and pop-ups near you, so "Shop" can also mean "walk there".
 
 ## Go-to-market
 
@@ -115,5 +116,11 @@ Everything is covered by unit tests (`npm test`).
 - **Ads eroding trust.** The partner rules are product rules, not guidelines. Watch the "Not interested" rate on partner posts.
 - **Thin affiliate margins.** Partners and drops carry the business; affiliate proves demand.
 - **Community moderation.** Clubs need reporting, moderators, and clear rules from day one.
+- **Meeting in person.** Local events bring real safety duties:
+  - Store only an approximate area (about 1 km), never exact locations.
+  - Round shown distances so nobody can be pinpointed.
+  - Ask hosts for public places, and show safety tips on every event.
+  - Make reporting one tap, and review new hosts.
+  - Keep age limits and verification in mind before launch.
 - **Fake quotes.** Misattribution is everywhere online. Every quote carries a source and is flagged "attributed" when it can't be traced.
 - **Name.** Check the "NicheNotes" trademark and handles before spending on the brand.

@@ -34,6 +34,7 @@ Apple builds accessibility into every product, because a product that shuts peop
 - **Easy to tap.** Every icon button is at least 44 × 44 points.
 - **Respectful of settings.** Dark mode and reduced motion follow the device automatically unless the person chooses otherwise.
 - **Labeled.** Every control has a text label a screen reader can announce.
+- **Private by default.** Location is optional and approximate. The app keeps only a general area, rounds every distance it shows, and never shows anyone where you are.
 
 ## 5. Let the product be the hero
 

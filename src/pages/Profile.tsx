@@ -8,7 +8,7 @@ import { useStore } from '../state/store'
 import { useUI } from '../state/ui'
 import { ObjectArt } from '../components/ObjectArt'
 import { ItemCard } from '../components/cards/Cards'
-import { PageTitle, SectionHeader } from '../components/bits'
+import { PageTitle, SectionHeader, Segmented } from '../components/bits'
 
 export function Profile() {
   const store = useStore()
@@ -190,23 +190,3 @@ export function Profile() {
   )
 }
 
-function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (v: T) => void }) {
-  return (
-    <div className="mt-4" role="radiogroup" aria-label={label}>
-      <p className="t-foot mb-2 font-semibold text-ink-2">{label}</p>
-      <div className="flex rounded-[12px] bg-surface p-1">
-        {options.map(([v, name]) => (
-          <button
-            key={String(v)}
-            role="radio"
-            aria-checked={value === v}
-            className={`min-h-[44px] flex-1 rounded-[9px] text-[0.9375rem] font-medium ${value === v ? 'bg-bg text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]' : 'text-ink-2'}`}
-            onClick={() => onChange(v)}
-          >
-            {name}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}

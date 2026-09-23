@@ -10,14 +10,19 @@ import {
   recordImpression,
   takeSnapshot,
   VIBES,
+  approximate,
+  distanceKm,
+  type DistanceUnit,
   type EventKind,
+  type LatLng,
   type Profile,
   type Reason,
   type Tags,
   type VibeId,
 } from '../engine'
 import { CATALOG, CLUB_BY_ID, itemById } from '../data/catalog'
-import type { AnyItem, PostItem, QuoteTheme } from '../data/types'
+import type { AnyItem, EventComment, EventItem, PostItem, QuoteTheme } from '../data/types'
+import { generateLocal, sampleComments } from '../data/local'
 import * as storage from './storage'
 
 export interface Scout {
@@ -33,6 +38,24 @@ export interface Settings {
   appearance: 'auto' | 'light' | 'dark'
   /** Multiplier on the base text size; the whole type scale is in rem. */
   textSize: 1 | 1.12 | 1.25
+}
+
+/** The person's area. Only an approximate center is ever stored. */
+export interface Area {
+  center: LatLng
+  label: string
+  placeId?: string
+  radiusKm: number
+  unit: DistanceUnit
+}
+
+export interface HostInput {
+  club: string
+  title: string
+  venue: string
+  startsAt: number
+  capacity?: number
+  detail: string
 }
 
 interface Persisted {
@@ -52,6 +75,12 @@ interface Persisted {
   ritualLog: Record<string, string[]>
   scouted: Scout[]
   seed: number
+  area: Area | null
+  going: string[]
+  comments: Record<string, EventComment[]>
+  myEvents: EventItem[]
+  reported: string[]
+  areaPromptDismissed: boolean
 }
 
 export interface FeedEntry {
@@ -97,12 +126,19 @@ function fresh(): Persisted {
     ritualLog: {},
     scouted: [],
     seed: Math.floor(Math.random() * 1e9),
+    area: null,
+    going: [],
+    comments: {},
+    myEvents: [],
+    reported: [],
+    areaPromptDismissed: false,
   }
 }
 
 function boot(): Persisted {
   const saved = storage.load<Persisted>()
-  const base = saved?.v === 3 ? saved : fresh()
+  // Fill in fields added since the data was saved, so nobody loses their taste profile.
+  const base = saved?.v === 3 ? { ...fresh(), ...saved } : fresh()
   // New session: fade stale interests, then freeze a snapshot for trend arrows.
   return { ...base, profile: takeSnapshot(decayProfile(base.profile, Date.now())) }
 }
@@ -122,8 +158,41 @@ function useStoreValue() {
 
   useEffect(() => storage.save(state), [state])
 
-  const allItems = useCallback((): AnyItem[] => [...CATALOG, ...stateRef.current.myPosts], [])
-  const lookup = useCallback((id: string) => itemById(id, stateRef.current.myPosts), [])
+  // Sample local content for the chosen area. Regenerated only when the area changes.
+  const areaKey = state.area ? `${state.area.center.lat},${state.area.center.lng},${state.area.label}` : ''
+  const local = useMemo(
+    () => (state.area ? generateLocal(state.area.center, state.area.label, Date.now()) : { events: [], posts: [] }),
+    [areaKey], // keyed on the area only, so games don't reshuffle on every render
+  )
+  const localRef = useRef(local)
+  localRef.current = local
+
+  const distanceTo = useCallback((p: LatLng) => (stateRef.current.area ? distanceKm(stateRef.current.area.center, p) : undefined), [])
+
+  /** Upcoming events and local posts inside the person's radius. */
+  const nearby = useCallback(() => {
+    const s = stateRef.current
+    if (!s.area) return { events: [] as EventItem[], posts: [] as PostItem[] }
+    const inRange = (p: LatLng) => distanceKm(s.area!.center, p) <= s.area!.radiusKm
+    const soon = Date.now() - 2 * 3_600_000
+    const blocked = new Set([...s.hidden, ...s.reported])
+    const events = [...s.myEvents, ...localRef.current.events]
+      .filter((e) => e.startsAt > soon && inRange(e.at) && !blocked.has(e.id))
+      .sort((a, b) => a.startsAt - b.startsAt)
+    const posts = [...s.myPosts.filter((p) => p.near), ...localRef.current.posts].filter((p) => p.near && inRange(p.near) && !blocked.has(p.id))
+    return { events, posts }
+  }, [])
+
+  const extras = useCallback((): AnyItem[] => {
+    const s = stateRef.current
+    return [...s.myPosts, ...s.myEvents, ...localRef.current.events, ...localRef.current.posts]
+  }, [])
+
+  const allItems = useCallback((): AnyItem[] => {
+    const n = nearby()
+    return [...CATALOG, ...stateRef.current.myPosts, ...n.events, ...n.posts]
+  }, [nearby])
+  const lookup = useCallback((id: string) => itemById(id, extras()), [extras])
 
   const toast = useCallback((t: Omit<Toast, 'id'>) => {
     const id = Date.now() + Math.random()
@@ -171,11 +240,11 @@ function useStoreValue() {
     const recent = feedRef.current.length
       ? feedRef.current
           .slice(-5)
-          .map((e) => (e.id ? itemById(e.id, s.myPosts) : undefined))
+          .map((e) => (e.id ? itemById(e.id, extras()) : undefined))
           .filter((i): i is AnyItem => !!i)
       : [{ type: 'quote' as const, tags: {} }]
     const batch = rankBatch({
-      catalog: allItems().filter((i) => !(i.type === 'post' && i.mine)),
+      catalog: allItems().filter((i) => !((i.type === 'post' || i.type === 'event') && i.mine)),
       profile: s.profile,
       shownIds: new Set(s.shown),
       excludeIds: new Set([...s.hidden, ...doneToday]),
@@ -190,7 +259,7 @@ function useStoreValue() {
     feedRef.current = [...feedRef.current, ...unlockEntries, ...entries]
     setFeed((f) => [...f, ...unlockEntries, ...entries])
     update((st) => ({ ...st, shown: [...st.shown, ...batch.map((r) => r.item.id)].slice(-MAX_SHOWN) }))
-  }, [allItems, update])
+  }, [allItems, extras, update])
 
   const resetFeed = useCallback(() => setFeed([]), [])
 
@@ -270,8 +339,9 @@ function useStoreValue() {
   )
 
   const addPost = useCallback(
-    (clubId: string, text: string) => {
+    (clubId: string, text: string, local = false) => {
       const club = CLUB_BY_ID[clubId]
+      const area = stateRef.current.area
       const post: PostItem = {
         id: `mine-${Date.now()}`,
         type: 'post',
@@ -285,12 +355,103 @@ function useStoreValue() {
         source: clubId,
         createdAt: Date.now(),
         popularity: 0,
+        near: local && area ? { ...area.center, label: area.label } : undefined,
       }
       update((s) => ({ ...s, myPosts: [post, ...s.myPosts] }))
       signal('post', club.tags, 'post')
       return post
     },
     [signal, update],
+  )
+
+  const setArea = useCallback(
+    (area: Omit<Area, 'radiusKm' | 'unit'> & Partial<Pick<Area, 'radiusKm' | 'unit'>>, unit: DistanceUnit) => {
+      const prev = stateRef.current.area
+      update((s) => ({
+        ...s,
+        area: { ...area, center: approximate(area.center), unit: area.unit ?? prev?.unit ?? unit, radiusKm: area.radiusKm ?? prev?.radiusKm ?? (unit === 'mi' ? 16.09 : 15) },
+      }))
+      setFeed([])
+    },
+    [update],
+  )
+
+  const updateArea = useCallback(
+    (patch: Partial<Pick<Area, 'radiusKm' | 'unit'>>) => {
+      update((s) => (s.area ? { ...s, area: { ...s.area, ...patch } } : s))
+      setFeed([])
+    },
+    [update],
+  )
+
+  const clearArea = useCallback(() => {
+    update((s) => ({ ...s, area: null }))
+    setFeed([])
+  }, [update])
+
+  const toggleGoing = useCallback(
+    (event: EventItem) => {
+      const on = !stateRef.current.going.includes(event.id)
+      update((s) => ({ ...s, going: toggle(s.going, event.id, on) }))
+      track(on ? 'rsvp' : 'unrsvp', event)
+      toast({ tone: 'info', title: on ? "You're going. See you there." : 'No longer going' })
+    },
+    [track, update, toast],
+  )
+
+  const commentsFor = useCallback((event: EventItem): EventComment[] => {
+    const own = stateRef.current.comments[event.id] ?? []
+    return [...(event.mine ? [] : sampleComments(event.id, event.startsAt)), ...own]
+  }, [])
+
+  const addComment = useCallback(
+    (event: EventItem, text: string) => {
+      const c: EventComment = { id: `c-${Date.now()}`, author: stateRef.current.handle || 'you', text, at: Date.now(), mine: true }
+      update((s) => ({ ...s, comments: { ...s.comments, [event.id]: [...(s.comments[event.id] ?? []), c] } }))
+      track('post', event)
+    },
+    [track, update],
+  )
+
+  const hostEvent = useCallback(
+    (input: HostInput): EventItem | undefined => {
+      const area = stateRef.current.area
+      if (!area) return undefined
+      const club = CLUB_BY_ID[input.club]
+      const event: EventItem = {
+        id: `my-ev-${Date.now()}`,
+        type: 'event',
+        title: input.title,
+        club: input.club,
+        venue: input.venue,
+        at: area.center,
+        area: area.label,
+        startsAt: input.startsAt,
+        going: 0,
+        capacity: input.capacity,
+        detail: input.detail,
+        host: stateRef.current.handle || 'you',
+        mine: true,
+        tags: club.tags,
+        source: input.club,
+        createdAt: Date.now(),
+        popularity: 0,
+      }
+      update((s) => ({ ...s, myEvents: [event, ...s.myEvents], going: [...s.going, event.id] }))
+      signal('post', club.tags, 'event')
+      toast({ tone: 'info', title: 'Your event is live', body: `People in ${club.name} near ${area.label} can see it now.` })
+      return event
+    },
+    [signal, toast, update],
+  )
+
+  const report = useCallback(
+    (id: string) => {
+      update((s) => ({ ...s, reported: [...new Set([...s.reported, id])] }))
+      setFeed((f) => f.filter((e) => e.id !== id))
+      toast({ tone: 'info', title: 'Thanks for reporting', body: 'We have hidden it and our team will review it.' })
+    },
+    [update, toast],
   )
 
   const follow = useCallback(
@@ -356,6 +517,8 @@ function useStoreValue() {
     [update],
   )
 
+  const dismissAreaPrompt = useCallback(() => update((s) => ({ ...s, areaPromptDismissed: true })), [update])
+
   const setSettings = useCallback((patch: Partial<Settings>) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })), [update])
   const setThemes = useCallback((themes: QuoteTheme[]) => update((s) => ({ ...s, themes })), [update])
 
@@ -408,6 +571,17 @@ function useStoreValue() {
     search,
     scout,
     completeOnboarding,
+    nearby,
+    distanceTo,
+    setArea,
+    updateArea,
+    clearArea,
+    toggleGoing,
+    commentsFor,
+    addComment,
+    hostEvent,
+    report,
+    dismissAreaPrompt,
     setSettings,
     setThemes,
     reset,

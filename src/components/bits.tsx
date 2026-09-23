@@ -84,3 +84,51 @@ export function timeAgo(ts: number): string {
   if (h < 24) return `${h}h`
   return `${Math.round(h / 24)}d`
 }
+
+export function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (v: T) => void }) {
+  return (
+    <div className="mt-4" role="radiogroup" aria-label={label}>
+      <p className="t-foot mb-2 font-semibold text-ink-2">{label}</p>
+      <div className="flex rounded-[12px] bg-surface p-1">
+        {options.map(([v, name]) => (
+          <button
+            key={String(v)}
+            role="radio"
+            aria-checked={value === v}
+            className={`min-h-[44px] flex-1 rounded-[9px] text-[0.9375rem] font-medium ${value === v ? 'bg-bg text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]' : 'text-ink-2'}`}
+            onClick={() => onChange(v)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** "Today · 6:30 PM", "Tomorrow · 9:00 AM", "Sat, Sep 27 · 10:00 AM" in the viewer's own locale. */
+export function eventTime(ts: number): string {
+  const d = new Date(ts)
+  const time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  return `${dayLabel(ts, 'short')} · ${time}`
+}
+
+export function dayLabel(ts: number, style: 'short' | 'long' = 'long'): string {
+  const d = new Date(ts)
+  const today = new Date()
+  const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) / 86_400_000)
+  if (diff === 0) return 'Today'
+  if (diff === 1) return 'Tomorrow'
+  return d.toLocaleDateString(undefined, { weekday: style, month: 'short', day: 'numeric' })
+}
+
+/** Calendar-style date tile for events. */
+export function DateTile({ ts }: { ts: number }) {
+  const d = new Date(ts)
+  return (
+    <span className="flex w-12 shrink-0 flex-col items-center rounded-[12px] bg-bg py-1.5" aria-hidden="true">
+      <span className="text-[0.6875rem] font-semibold text-danger">{d.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+      <span className="text-[1.375rem] leading-none font-semibold">{d.getDate()}</span>
+    </span>
+  )
+}

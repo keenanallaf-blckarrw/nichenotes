@@ -1,12 +1,12 @@
-import { Check, Sparkles } from 'lucide-react'
+import { Check, ChevronRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { COMBO_BY_ID, comboRecipe, effectiveAffinity } from '../../engine'
+import { COMBO_BY_ID, comboRecipe, effectiveAffinity, formatDistance } from '../../engine'
 import { CLUB_BY_ID, FIND_BY_ID, SHOP_BY_ID } from '../../data/catalog'
-import type { AnyItem, FindItem, FitItem, PostItem, QuoteItem, RitualItem } from '../../data/types'
+import type { AnyItem, EventItem, FindItem, FitItem, PostItem, QuoteItem, RitualItem } from '../../data/types'
 import { useStore } from '../../state/store'
 import { useUI } from '../../state/ui'
 import { ObjectArt } from '../ObjectArt'
-import { Avatar, money, timeAgo } from '../bits'
+import { Avatar, DateTile, eventTime, money, timeAgo } from '../bits'
 import { CardActions } from './CardActions'
 
 /** Why text for a card: shown only when notable, otherwise it lives in the ••• menu. */
@@ -97,7 +97,9 @@ export function FitCard({ item, why }: { item: FitItem; why?: Why }) {
 }
 
 export function PostCard({ item, why }: { item: PostItem; why?: Why }) {
+  const store = useStore()
   const club = CLUB_BY_ID[item.club]
+  const km = item.near ? store.distanceTo(item.near) : undefined
   return (
     <article className="flex gap-3">
       <Avatar name={item.author} />
@@ -109,6 +111,7 @@ export function PostCard({ item, why }: { item: PostItem; why?: Why }) {
             {club.name}
           </Link>
           <span className="text-ink-3">· {timeAgo(item.createdAt)}</span>
+          {item.near && <span className="text-ink-3">· {km !== undefined && store.area ? `${formatDistance(km, store.area.unit)} away` : `near ${item.near.label}`}</span>}
         </div>
         <p className="mt-0.5 text-[1rem] leading-[1.45]">{item.text}</p>
         <div className="mt-1 flex flex-col gap-0.5">
@@ -171,6 +174,89 @@ export function UnlockCard({ combo }: { combo: string }) {
   )
 }
 
+function useEventInfo(item: EventItem) {
+  const store = useStore()
+  const going = item.going + (store.going.includes(item.id) ? 1 : 0)
+  const km = store.distanceTo(item.at)
+  const d = km !== undefined && store.area ? formatDistance(km, store.area.unit) : undefined
+  // Shown at the start of a line, so capitalize ("Less than 0.5 mi away").
+  const distance = d && d[0].toUpperCase() + d.slice(1)
+  const spots = item.capacity ? Math.max(0, item.capacity - going) : undefined
+  return { going, distance, spots, isGoing: store.going.includes(item.id) }
+}
+
+/** A real-world meetup in the feed. The one action is Join. */
+export function EventCard({ item, why }: { item: EventItem; why?: Why }) {
+  const ui = useUI()
+  const store = useStore()
+  const club = CLUB_BY_ID[item.club]
+  const { going, distance, spots, isGoing } = useEventInfo(item)
+  return (
+    <article className="rounded-[20px] bg-surface p-4">
+      <p className="t-foot font-semibold text-ink-2">
+        {club.name} · Near you
+      </p>
+      <div className="mt-2 flex gap-4">
+        <DateTile ts={item.startsAt} />
+        <button className="min-w-0 flex-1 text-left" onClick={() => (store.track('open', item), ui.open({ kind: 'event', id: item.id }))} aria-label={`View ${item.title}`}>
+          <h3 className="t-headline">{item.title}</h3>
+          <p className="t-sub text-ink-2">{eventTime(item.startsAt)}</p>
+          <p className="t-sub text-ink-2">{item.venue}</p>
+          <p className="t-foot mt-1 text-ink-2">
+            {distance ? `${distance} away · ` : ''}
+            {going} going{spots !== undefined ? ` · ${spots === 0 ? 'full' : `${spots} spots left`}` : ''}
+          </p>
+        </button>
+      </div>
+      <div className="mt-3 flex items-center gap-2">
+        <button className={`btn ${isGoing ? 'btn-secondary !bg-surface-2' : 'btn-primary'}`} onClick={() => store.toggleGoing(item)} aria-pressed={isGoing}>
+          {isGoing ? (
+            <>
+              <Check size={16} strokeWidth={2.5} /> Going
+            </>
+          ) : (
+            'Join'
+          )}
+        </button>
+        <button className="btn btn-secondary !bg-surface-2" onClick={() => ui.open({ kind: 'event', id: item.id })}>
+          Discuss
+        </button>
+      </div>
+      <div className="mt-1 flex flex-col gap-0.5">
+        <WhyLine why={why} />
+        <CardActions item={item} why={why?.text} />
+      </div>
+    </article>
+  )
+}
+
+/** Compact event for grouped lists (Nearby, club pages). */
+export function EventRow({ item }: { item: EventItem }) {
+  const ui = useUI()
+  const store = useStore()
+  const { going, distance, isGoing } = useEventInfo(item)
+  return (
+    <button
+      className="flex w-full items-center gap-3 border-b-[0.5px] border-line px-3 py-3 text-left last:border-b-0"
+      onClick={() => (store.track('open', item), ui.open({ kind: 'event', id: item.id }))}
+    >
+      <DateTile ts={item.startsAt} />
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium">{item.title}</span>
+        <span className="t-foot block truncate text-ink-2">
+          {eventTime(item.startsAt)} · {item.venue}
+        </span>
+        <span className="t-foot block text-ink-2">
+          {distance ? `${distance} away · ` : ''}
+          {going} going
+          {isGoing && <span className="font-semibold text-accent-text"> · You're going</span>}
+        </span>
+      </span>
+      <ChevronRight size={18} className="shrink-0 text-ink-3" />
+    </button>
+  )
+}
+
 export function ItemCard({ item, why }: { item: AnyItem; why?: Why }) {
   switch (item.type) {
     case 'quote':
@@ -183,5 +269,7 @@ export function ItemCard({ item, why }: { item: AnyItem; why?: Why }) {
       return <PostCard item={item} why={why} />
     case 'ritual':
       return <HabitCard item={item} why={why} />
+    case 'event':
+      return <EventCard item={item} why={why} />
   }
 }

@@ -5,6 +5,8 @@ import type { AnyItem } from '../data/types'
 import { useStore, type FeedEntry } from '../state/store'
 import { ItemCard, UnlockCard } from '../components/cards/Cards'
 import { PageTitle } from '../components/bits'
+import { useUI } from '../state/ui'
+import { MapPin } from 'lucide-react'
 
 function today(): string {
   return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -77,6 +79,29 @@ function Entry({ entry }: { entry: FeedEntry }) {
   )
 }
 
+/** One gentle, dismissible nudge to turn on the local side of the app. */
+function AreaPrompt() {
+  const store = useStore()
+  const ui = useUI()
+  if (store.area || store.areaPromptDismissed) return null
+  return (
+    <section className="mt-8 rounded-[20px] bg-surface px-5 py-5">
+      <p className="t-headline flex items-center gap-2">
+        <MapPin size={18} className="text-accent-text" aria-hidden="true" /> Games and meetups near you
+      </p>
+      <p className="t-sub mt-1 text-ink-2">Pickup games, walks and meetups from clubs you like, within a distance you choose.</p>
+      <div className="mt-4 flex gap-2">
+        <button className="btn btn-primary" onClick={() => ui.open({ kind: 'area' })}>
+          Set your area
+        </button>
+        <button className="btn btn-secondary !bg-surface-2" onClick={store.dismissAreaPrompt}>
+          Not now
+        </button>
+      </div>
+    </section>
+  )
+}
+
 export function Feed() {
   const store = useStore()
   const sentinel = useRef<HTMLDivElement>(null)
@@ -99,6 +124,7 @@ export function Feed() {
     <div>
       <PageTitle title="For You" subtitle={today()} />
       <DailyQuote />
+      <AreaPrompt />
       <div className="mt-10 flex flex-col gap-12">
         {store.feed.map((e) => (
           <Entry key={e.key} entry={e} />

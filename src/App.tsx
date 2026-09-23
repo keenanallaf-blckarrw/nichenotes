@@ -8,6 +8,7 @@ import { Onboarding } from './pages/Onboarding'
 import { Feed } from './pages/Feed'
 import { Discover, InterestPage } from './pages/Discover'
 import { Clubs, ClubPage } from './pages/Clubs'
+import { Nearby } from './pages/Nearby'
 import { Profile } from './pages/Profile'
 import { Brands } from './pages/Brands'
 
@@ -60,6 +61,7 @@ function Routed() {
         <Route path="/i/:id" element={<InterestPage />} />
         <Route path="/clubs" element={<Clubs />} />
         <Route path="/clubs/:id" element={<ClubPage />} />
+        <Route path="/nearby" element={<Nearby />} />
         <Route path="/me" element={<Profile />} />
         <Route path="/brands" element={<Brands />} />
         <Route path="*" element={<Feed />} />

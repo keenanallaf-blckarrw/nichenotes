@@ -19,6 +19,9 @@ export const EVENT_WEIGHTS: Record<EventKind, number> = {
   search: 0.5,
   follow: 3,
   mute: -4,
+  // Showing up in person is the strongest signal of real interest.
+  rsvp: 2.5,
+  unrsvp: -1.5,
 }
 
 /** Interests fade if you stop engaging with them. */

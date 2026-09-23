@@ -5,7 +5,7 @@ A For You feed for anyone that learns your taste and leads you to great things n
 - products and outfits from small shops
 - a quote worth keeping each morning (philosophers, athletes, artists, founders, leaders)
 - daily habits
-- clubs of people into the same things
+- clubs of people into the same things, with pickup games and meetups near you
 
 This is a **working prototype**: a phone-first web app with a real recommendation engine, sample data and no backend. Everything a user does is stored on their device.
 
@@ -32,11 +32,13 @@ src/
     profile.ts     Learning: signal weights, decay, unlocks
     rank.ts        Feed ranking: relevance, variety, exploration, partner slots
     explain.ts     "Why am I seeing this?" lines and the taste summary
+    geo.ts         Distances, directions and privacy rounding for local features
   data/          Sample catalog: quotes (with sources), shops, finds, outfits, clubs, posts, daily habits.
+                 local.ts generates sample events and posts around any area.
                  catalog.test.ts checks that every interest leads to real content.
   state/         App state (React context) and local persistence
   components/    Cards, sheets, the app shell, drawn product images
-  pages/         Onboarding, For You, Discover, interest pages, Clubs, You, For brands
+  pages/         Onboarding, For You, Discover, interest pages, Clubs, Near you, You, For brands
 ```
 
 ## How the feed learns

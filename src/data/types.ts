@@ -1,4 +1,4 @@
-import type { CatalogItem } from '../engine'
+import type { CatalogItem, LatLng } from '../engine'
 
 export type QuoteTheme = 'philosophers' | 'athletes' | 'creators' | 'founders' | 'leaders' | 'mindful'
 
@@ -106,6 +106,8 @@ export interface PostItem extends CatalogItem {
   likes: number
   replies: number
   mine?: boolean
+  /** Set for local posts. Always an approximate point, never someone's exact location. */
+  near?: LatLng & { label: string }
 }
 
 export interface RitualItem extends CatalogItem {
@@ -115,7 +117,34 @@ export interface RitualItem extends CatalogItem {
   minutes: number
 }
 
-export type AnyItem = QuoteItem | FindItem | FitItem | PostItem | RitualItem
+/** A meetup in the real world: a pickup game, a photo walk, a book club. */
+export interface EventItem extends CatalogItem {
+  type: 'event'
+  title: string
+  club: string
+  /** A public place: a park, courts, a café, a library. */
+  venue: string
+  at: LatLng
+  /** Name of the area, e.g. "Detroit". */
+  area: string
+  startsAt: number
+  going: number
+  /** Spots in total, when it matters (a 5-on-5 needs 10). */
+  capacity?: number
+  detail: string
+  host: string
+  mine?: boolean
+}
+
+export interface EventComment {
+  id: string
+  author: string
+  text: string
+  at: number
+  mine?: boolean
+}
+
+export type AnyItem = QuoteItem | FindItem | FitItem | PostItem | RitualItem | EventItem
 
 export interface Club {
   id: string
@@ -123,4 +152,11 @@ export interface Club {
   blurb: string
   tags: Record<string, number>
   members: number
+}
+
+/** A place people can choose as the center of their area. */
+export interface Place extends LatLng {
+  id: string
+  name: string
+  country: string
 }

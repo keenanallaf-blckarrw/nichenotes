@@ -8,6 +8,7 @@ import { useUI } from '../state/ui'
 import { ObjectArt } from './ObjectArt'
 import { Sheet, money } from './bits'
 import { CardActions } from './cards/CardActions'
+import { AreaSheet, EventSheet, HostSheet } from './LocalSheets'
 
 export function Sheets() {
   const ui = useUI()
@@ -21,6 +22,12 @@ export function Sheets() {
       return <SuggestSheet />
     case 'interests':
       return <InterestsSheet />
+    case 'event':
+      return <EventSheet key={ui.sheet.id} id={ui.sheet.id} />
+    case 'host':
+      return <HostSheet key={ui.sheet.club ?? 'any'} club={ui.sheet.club} />
+    case 'area':
+      return <AreaSheet />
     default:
       return null
   }

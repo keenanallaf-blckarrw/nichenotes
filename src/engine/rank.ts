@@ -21,7 +21,7 @@ const EXPLORE_SLOTS = [2, 7]
 const PARTNER_SLOT = 4
 /** A partner item must genuinely match the viewer to earn its slot. */
 export const PARTNER_MIN_RELEVANCE = 0.25
-const MAX_PER_TYPE: Record<ItemType, number> = { find: 4, quote: 2, post: 3, fit: 2, ritual: 1 }
+const MAX_PER_TYPE: Record<ItemType, number> = { find: 4, quote: 2, post: 3, fit: 2, ritual: 1, event: 2 }
 const DAY = 86_400_000
 
 /** Deterministic PRNG so a feed can be reproduced from its seed. */

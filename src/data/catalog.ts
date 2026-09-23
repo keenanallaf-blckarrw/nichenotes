@@ -25,5 +25,7 @@ export function itemName(item: AnyItem): string {
       return `@${item.author}'s post`
     case 'ritual':
       return item.title
+    case 'event':
+      return item.title
   }
 }

@@ -2,6 +2,7 @@ import type { Club, FitItem, PostItem, RitualItem } from './types'
 import { daysAgo } from './time'
 
 export const CLUBS: Club[] = [
+  { id: 'pickup-soccer', name: 'Pickup Soccer', blurb: 'Find a game near you, or start one.', tags: { soccer: 1 }, members: 27400 },
   { id: 'retro-jerseys', name: 'Retro Jerseys', blurb: 'Classic jerseys, game-day outfits, thrift finds.', tags: { soccer: 1, retrojerseys: 1, vintage: 0.4 }, members: 18400 },
   { id: 'stadium-travel', name: 'Stadium Travel', blurb: 'Stadiums, road trips, the best food at the game.', tags: { soccer: 0.8, travel: 0.8, stadiumtravel: 1 }, members: 4100 },
   { id: 'daily-stoic', name: 'Daily Stoic', blurb: 'One passage a day, and what it means to you.', tags: { philosophy: 1, reading: 0.4 }, members: 22700 },
@@ -60,6 +61,7 @@ type P = Omit<PostItem, 'type' | 'createdAt' | 'popularity' | 'tags' | 'source'>
 
 // Sample community posts for the prototype. Usernames are invented.
 const RAW_POSTS: P[] = [
+  { id: 'p-pickupsoccer', author: 'cones_and_coffee', club: 'pickup-soccer', text: 'Moved to a new city and found a Tuesday pickup game within a week. Best way to make friends as an adult.', likes: 1720, replies: 133, hoursAgo: 5 },
   { id: 'p-thrift', author: 'thrift_tom', club: 'retro-jerseys', text: 'Found a lace-collar goalkeeper jersey at a flea market for $4. The seller had no idea. What is your best thrift find?', likes: 842, replies: 131, hoursAgo: 3 },
   { id: 'p-wedding', author: 'lagos_left_back', club: 'retro-jerseys', text: 'Wore a 1998 away jersey with pleated pants to a wedding. Mixed reviews. Would do it again.', likes: 1290, replies: 204, hoursAgo: 20 },
   { id: 'p-stadiums', author: 'stadium_ali', club: 'stadium-travel', text: 'Stadium count: 37. My rule: the smaller the club, the better the food.', likes: 388, replies: 72, hoursAgo: 9 },

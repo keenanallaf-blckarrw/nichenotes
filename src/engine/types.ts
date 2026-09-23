@@ -1,5 +1,5 @@
 export type VibeId = string
-export type ItemType = 'quote' | 'find' | 'fit' | 'post' | 'ritual'
+export type ItemType = 'quote' | 'find' | 'fit' | 'post' | 'ritual' | 'event'
 
 /** Tag weights in 0..1 describing what an item is about. Keys are vibe or combo ids. */
 export type Tags = Record<VibeId, number>
@@ -35,6 +35,8 @@ export type EventKind =
   | 'search'
   | 'follow'
   | 'mute'
+  | 'rsvp'
+  | 'unrsvp'
 
 export interface VibeEvent {
   kind: EventKind

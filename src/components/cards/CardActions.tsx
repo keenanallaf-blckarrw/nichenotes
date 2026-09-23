@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bookmark, EyeOff, Heart, Info, MoreHorizontal, Share, VolumeX } from 'lucide-react'
+import { Bookmark, EyeOff, Flag, Heart, Info, MoreHorizontal, Share, VolumeX } from 'lucide-react'
 import { labelOf, VIBE_BY_ID } from '../../engine'
 import type { AnyItem } from '../../data/types'
 import { useStore } from '../../state/store'
@@ -72,6 +72,11 @@ export function CardActions({ item, likes, why }: { item: AnyItem; likes?: numbe
             {vibe && (
               <button className={`${row} border-t-[0.5px] border-line`} onClick={() => (setMenu(false), store.mute(vibe))}>
                 Hide all {labelOf(vibe)} <VolumeX size={17} className="text-ink-2" />
+              </button>
+            )}
+            {(item.type === 'post' || item.type === 'event') && !item.mine && (
+              <button className={`${row} border-t-[0.5px] border-line text-danger`} onClick={() => (setMenu(false), store.report(item.id))}>
+                Report <Flag size={17} />
               </button>
             )}
           </div>
