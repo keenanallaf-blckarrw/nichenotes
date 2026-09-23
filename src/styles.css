@@ -1,0 +1,345 @@
+@import 'tailwindcss';
+
+/*
+ * NicheNotes tokens. Light palette on :root; dark overrides follow the OS unless
+ * the host stamps data-theme. Components read tokens only, never literals.
+ *
+ * Direction: matchday + museum. Chalk-and-pitch neutrals, an away-kit cobalt
+ * accent, quotes carved on pitch-green slabs, finds printed as hang tags.
+ */
+:root {
+  --bg: #eceee8;
+  --surface: #f8f9f5;
+  --surface-2: #e2e6de;
+  --ink: #121712;
+  --ink-2: #4e5950;
+  --ink-3: #78837a;
+  --line: #d0d6cd;
+  --accent: #2143c4;
+  --accent-ink: #ffffff;
+  --accent-soft: #dce3fa;
+  --slab: #1b3727;
+  --slab-ink: #eae3cf;
+  --slab-ink-2: #b4b09a;
+  --gold: #a87a12;
+  --gold-soft: #f3e6bf;
+  --danger: #b3372b;
+  --shadow: 0 1px 0 rgb(18 23 18 / 0.04), 0 8px 24px -12px rgb(18 23 18 / 0.18);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0c0f0d;
+    --surface: #141915;
+    --surface-2: #1c231e;
+    --ink: #e8ece5;
+    --ink-2: #a3ada4;
+    --ink-3: #6f7a71;
+    --line: #262e28;
+    --accent: #8098ff;
+    --accent-ink: #0c0f0d;
+    --accent-soft: #1d2547;
+    --slab: #13281c;
+    --slab-ink: #e6dfca;
+    --slab-ink-2: #a5a08a;
+    --gold: #e3b64a;
+    --gold-soft: #3a2f12;
+    --danger: #e0685c;
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0c0f0d;
+  --surface: #141915;
+  --surface-2: #1c231e;
+  --ink: #e8ece5;
+  --ink-2: #a3ada4;
+  --ink-3: #6f7a71;
+  --line: #262e28;
+  --accent: #8098ff;
+  --accent-ink: #0c0f0d;
+  --accent-soft: #1d2547;
+  --slab: #13281c;
+  --slab-ink: #e6dfca;
+  --slab-ink-2: #a5a08a;
+  --gold: #e3b64a;
+  --gold-soft: #3a2f12;
+  --danger: #e0685c;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-slab: var(--slab);
+  --color-slab-ink: var(--slab-ink);
+  --color-slab-ink-2: var(--slab-ink-2);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-danger: var(--danger);
+  --font-display: 'Big Shoulders Display', 'Oswald', 'Arial Narrow', Impact, sans-serif;
+  --font-serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+  --font-sans: 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Finds are printed like hang tags: punched hole, string, mono price. */
+.hang-tag {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px 14px 14px 14px;
+  box-shadow: var(--shadow);
+}
+.hang-tag::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  z-index: 2;
+}
+
+/* Quotes are carved: a pitch-green slab with a faint inscription border. */
+.slab {
+  background: var(--slab);
+  color: var(--slab-ink);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.slab::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid color-mix(in srgb, var(--slab-ink) 18%, transparent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Rituals are tickets you tear: dashed perforation on the left. */
+.ticket {
+  background: var(--surface);
+  border: 1.5px dashed var(--line);
+  border-radius: 14px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  padding: 5px 11px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--ink);
+  color: var(--bg);
+  transition:
+    transform 0.1s,
+    opacity 0.15s;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.icon-btn[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.meter-fill {
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.anim-rise {
+  animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-sheet {
+  animation: sheet-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-fade {
+  animation: fade-in 0.2s ease both;
+}
+.anim-shimmer {
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.pb-tabbar {
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 1024px) {
+  .pb-tabbar {
+    padding-bottom: 48px;
+  }
+}
