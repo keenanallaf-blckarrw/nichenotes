@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 
-export type SheetState = { kind: 'item'; id: string } | { kind: 'shop'; id: string } | { kind: 'suggest' } | null
+export type SheetState = { kind: 'item'; id: string } | { kind: 'shop'; id: string } | { kind: 'suggest' } | { kind: 'interests' } | null
 
 interface UI {
   sheet: SheetState

@@ -17,7 +17,7 @@ function FindTile({ f }: { f: FindItem }) {
     <button className="flex flex-col gap-2 text-left" onClick={() => (store.track('open', f), ui.open({ kind: 'item', id: f.id }))}>
       <span className="relative block overflow-hidden rounded-[16px]">
         <ObjectArt art={f.art} className="block aspect-square w-full" />
-        {f.sponsored && <span className="absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-semibold text-white">Partner</span>}
+        {f.sponsored && <span className="absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[0.6875rem] font-semibold text-white">Partner</span>}
       </span>
       <span>
         <span className="t-foot line-clamp-2 font-semibold">{f.name}</span>
@@ -73,7 +73,7 @@ export function Discover() {
         <Search size={18} className="shrink-0 text-ink-3" />
         <input
           id="discover-search"
-          className="w-full bg-transparent text-[17px] outline-none placeholder:text-ink-3"
+          className="w-full bg-transparent text-[1.0625rem] outline-none placeholder:text-ink-3"
           placeholder="Search jerseys, cologne, Seneca…"
           value={q}
           onChange={(e) => setQ(e.target.value)}

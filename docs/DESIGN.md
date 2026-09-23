@@ -21,17 +21,27 @@ NicheNotes is designed the way Steve Jobs described good products. Each principl
 
 > "Design is not just what it looks like and feels like. Design is how it works." (The New York Times Magazine, 2003)
 
-- Onboarding takes two taps: pick what you're into, then pick whose words you want each morning.
+- Onboarding takes two steps: pick what you're into, then pick whose words you want each morning (or a mix of everything).
 - The feed learns silently. It only tells you why you're seeing something when the reason is interesting: you saved something similar, it's new for you, two of your interests crossed, or it's a paid partner.
 - Every other reason is still one tap away in the ••• menu, under **Why am I seeing this?**
 
-## 4. Let the product be the hero
+## 4. Made for everyone
+
+Apple builds accessibility into every product, because a product that shuts people out is not finished.
+
+- **For every kind of person.** There are 59 interests, not just one lifestyle. Copy never assumes gender, age, body or background.
+- **Readable.** All text is sized in rem, so it grows with the text-size setting in You › Display and with the device's own setting. Secondary text meets WCAG AA contrast.
+- **Easy to tap.** Every icon button is at least 44 × 44 points.
+- **Respectful of settings.** Dark mode and reduced motion follow the device automatically unless the person chooses otherwise.
+- **Labeled.** Every control has a text label a screen reader can announce.
+
+## 5. Let the product be the hero
 
 - Product images are big, on a clean neutral background, and consistent from card to card.
 - Chrome recedes. Separate things with space and hairlines, not boxes, shadows and borders.
 - Large titles at the top of each screen, like the system apps.
 
-## 5. Care about the back of the fence
+## 6. Care about the back of the fence
 
 Jobs's father taught him to finish the back of a fence as well as the front, even though no one would see it.
 
@@ -53,7 +63,7 @@ Jobs's father taught him to finish the back of a fence as well as the front, eve
 | `line` | #D2D2D7 | #38383A | Hairlines |
 | `accent` | #1464F4 | #1A6BFF | Buttons and links |
 
-- **Type scale:**
+- **Type scale** (in rem, shown here in points at default size):
   - Large title 34 bold
   - Title 28 bold
   - Title 2 22 semibold

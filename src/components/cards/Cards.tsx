@@ -23,7 +23,7 @@ function WhyLine({ why }: { why?: Why }) {
 export function QuoteCard({ item, why }: { item: QuoteItem; why?: Why }) {
   return (
     <article className="rounded-[20px] bg-surface px-6 pt-7 pb-3">
-      <blockquote className={`t-quote ${item.text.length > 110 ? 'text-[22px]' : 'text-[26px]'} leading-[1.25]`}>{item.text}</blockquote>
+      <blockquote className={`t-quote ${item.text.length > 110 ? 'text-[1.375rem]' : 'text-[1.625rem]'} leading-[1.25]`}>{item.text}</blockquote>
       {item.translation && <p className="t-sub mt-2 text-ink-2">{item.translation}</p>}
       <p className="t-sub mt-5 font-semibold">{item.author}</p>
       <p className="t-foot text-ink-2">
@@ -46,7 +46,7 @@ export function FindCard({ item, why }: { item: FindItem; why?: Why }) {
     <article>
       <button className="relative block w-full overflow-hidden rounded-[20px]" onClick={() => (store.track('open', item), ui.open({ kind: 'item', id: item.id }))} aria-label={`View ${item.name}`}>
         <ObjectArt art={item.art} className="block aspect-[4/3] w-full" />
-        {item.sponsored && <span className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">Partner</span>}
+        {item.sponsored && <span className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[0.75rem] font-semibold text-white backdrop-blur">Partner</span>}
       </button>
       <div className="mt-3 flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -110,7 +110,7 @@ export function PostCard({ item, why }: { item: PostItem; why?: Why }) {
           </Link>
           <span className="text-ink-3">· {timeAgo(item.createdAt)}</span>
         </div>
-        <p className="mt-0.5 text-[16px] leading-[1.45]">{item.text}</p>
+        <p className="mt-0.5 text-[1rem] leading-[1.45]">{item.text}</p>
         <div className="mt-1 flex flex-col gap-0.5">
           <WhyLine why={why} />
           <CardActions item={item} likes={item.likes} why={why?.text} />

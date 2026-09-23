@@ -85,7 +85,7 @@ export function ClubPage() {
         <textarea
           id="compose"
           rows={2}
-          className="w-full resize-none bg-transparent px-1 text-[17px] outline-none placeholder:text-ink-3"
+          className="w-full resize-none bg-transparent px-1 text-[1.0625rem] outline-none placeholder:text-ink-3"
           placeholder={`Share something with ${club.name}`}
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, 280))}

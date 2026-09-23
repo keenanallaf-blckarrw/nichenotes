@@ -16,8 +16,8 @@ import {
   type Tags,
   type VibeId,
 } from '../engine'
-import { CATALOG, CLUB_BY_ID, MENTORS, itemById } from '../data/catalog'
-import type { AnyItem, MentorId, PostItem } from '../data/types'
+import { CATALOG, CLUB_BY_ID, itemById } from '../data/catalog'
+import type { AnyItem, PostItem, QuoteTheme } from '../data/types'
 import * as storage from './storage'
 
 export interface Scout {
@@ -29,11 +29,19 @@ export interface Scout {
   at: number
 }
 
+export interface Settings {
+  appearance: 'auto' | 'light' | 'dark'
+  /** Multiplier on the base text size; the whole type scale is in rem. */
+  textSize: 1 | 1.12 | 1.25
+}
+
 interface Persisted {
-  v: 2
+  v: 3
   onboarded: boolean
   handle: string
-  mentor: MentorId | null
+  /** Morning-quote themes. Empty means every theme. */
+  themes: QuoteTheme[]
+  settings: Settings
   profile: Profile
   liked: string[]
   saved: string[]
@@ -63,7 +71,7 @@ export interface Toast {
 
 export interface OnboardingInput {
   vibes: VibeId[]
-  mentor: MentorId | null
+  themes: QuoteTheme[]
 }
 
 const BATCH = 10
@@ -75,10 +83,11 @@ function today(): string {
 
 function fresh(): Persisted {
   return {
-    v: 2,
+    v: 3,
     onboarded: false,
     handle: '',
-    mentor: null,
+    themes: [],
+    settings: { appearance: 'auto', textSize: 1 },
     profile: emptyProfile(Date.now()),
     liked: [],
     saved: [],
@@ -93,7 +102,7 @@ function fresh(): Persisted {
 
 function boot(): Persisted {
   const saved = storage.load<Persisted>()
-  const base = saved?.v === 2 ? saved : fresh()
+  const base = saved?.v === 3 ? saved : fresh()
   // New session: fade stale interests, then freeze a snapshot for trend arrows.
   return { ...base, profile: takeSnapshot(decayProfile(base.profile, Date.now())) }
 }
@@ -300,6 +309,12 @@ function useStoreValue() {
     [signal, toast],
   )
 
+  /** Remove an interest without penalizing it, like un-following. */
+  const unfollow = useCallback(
+    (id: VibeId) => update((s) => ({ ...s, profile: { ...s.profile, muted: s.profile.muted.filter((m) => m !== id), affinity: { ...s.profile.affinity, [id]: 0 } } })),
+    [update],
+  )
+
   const unmute = useCallback(
     (id: VibeId) => update((s) => ({ ...s, profile: { ...s.profile, muted: s.profile.muted.filter((m) => m !== id), affinity: { ...s.profile.affinity, [id]: 0 } } })),
     [update],
@@ -327,16 +342,13 @@ function useStoreValue() {
     (input: OnboardingInput) => {
       let profile = emptyProfile(Date.now())
       const unlockedAll: VibeId[] = []
-      const events = [
-        ...input.vibes.map((id) => ({ tags: { [id]: 1 }, strength: 1 })),
-        ...(input.mentor ? [{ tags: MENTORS.find((m) => m.id === input.mentor)!.tags, strength: 0.5 }] : []),
-      ]
+      const events = input.vibes.map((id) => ({ tags: { [id]: 1 }, strength: 1 }))
       for (const e of events) {
         const res = applyEvent(profile, { kind: 'seed', tags: e.tags, strength: e.strength }, Date.now())
         profile = res.profile
         unlockedAll.push(...res.unlocked)
       }
-      update((s) => ({ ...s, onboarded: true, mentor: input.mentor, profile: takeSnapshot({ ...profile, snapshot: {} }), shown: [] }))
+      update((s) => ({ ...s, onboarded: true, themes: input.themes, profile: takeSnapshot({ ...profile, snapshot: {} }), shown: [] }))
       // Unlocks from onboarding appear at the top of the first feed.
       pendingUnlocks.current = unlockedAll
       setFeed([])
@@ -344,9 +356,13 @@ function useStoreValue() {
     [update],
   )
 
+  const setSettings = useCallback((patch: Partial<Settings>) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })), [update])
+  const setThemes = useCallback((themes: QuoteTheme[]) => update((s) => ({ ...s, themes })), [update])
+
   const reset = useCallback(() => {
     storage.clear()
-    const next = fresh()
+    // Keep display settings: they are about the person's needs, not their taste.
+    const next = { ...fresh(), settings: stateRef.current.settings }
     stateRef.current = next
     setState(next)
     setFeed([])
@@ -387,10 +403,13 @@ function useStoreValue() {
     addPost,
     follow,
     mute,
+    unfollow,
     unmute,
     search,
     scout,
     completeOnboarding,
+    setSettings,
+    setThemes,
     reset,
     dismissToast: (id: number) => setToasts((ts) => ts.filter((t) => t.id !== id)),
   }

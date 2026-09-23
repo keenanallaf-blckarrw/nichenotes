@@ -24,8 +24,8 @@ function Toasts() {
         >
           {t.tone === 'unlock' && <Sparkles size={18} className="shrink-0" />}
           <span className="min-w-0">
-            <span className="block text-[15px] font-semibold">{t.title}</span>
-            {t.body && <span className="block text-[13px] opacity-75">{t.body}</span>}
+            <span className="block text-[0.9375rem] font-semibold">{t.title}</span>
+            {t.body && <span className="block text-[0.8125rem] opacity-75">{t.body}</span>}
           </span>
         </button>
       ))}
@@ -46,7 +46,7 @@ export function Shell({ children }: { children: ReactNode }) {
               key={to}
               to={to}
               end={end}
-              className={({ isActive }) => `flex items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] font-medium ${isActive ? 'bg-surface text-ink' : 'text-ink-2 hover:text-ink'}`}
+              className={({ isActive }) => `flex items-center gap-3 rounded-[10px] px-3 py-2 text-[0.9375rem] font-medium ${isActive ? 'bg-surface text-ink' : 'text-ink-2 hover:text-ink'}`}
             >
               <Icon size={19} /> {label}
             </NavLink>
@@ -71,7 +71,7 @@ export function Shell({ children }: { children: ReactNode }) {
               key={to}
               to={to}
               end={end}
-              className={({ isActive }) => `flex flex-1 flex-col items-center gap-1 pt-2 pb-2.5 text-[10.5px] font-medium ${isActive ? 'text-accent-text' : 'text-ink-3'}`}
+              className={({ isActive }) => `flex flex-1 flex-col items-center gap-1 pt-2 pb-2.5 text-[0.6562rem] font-medium ${isActive ? 'text-accent-text' : 'text-ink-3'}`}
             >
               <Icon size={24} strokeWidth={1.8} />
               {label}

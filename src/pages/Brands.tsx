@@ -70,7 +70,7 @@ export function Brands() {
           {SAMPLE.tiles.map((t) => (
             <div key={t.label} className="rounded-[16px] bg-surface p-4">
               <p className="t-foot text-ink-2">{t.label}</p>
-              <p className="mt-1 text-[28px] leading-none font-semibold tracking-[-0.02em]">{t.value}</p>
+              <p className="mt-1 text-[1.75rem] leading-none font-semibold tracking-[-0.02em]">{t.value}</p>
               <p className="t-foot mt-2 text-ink-3">{t.note}</p>
             </div>
           ))}

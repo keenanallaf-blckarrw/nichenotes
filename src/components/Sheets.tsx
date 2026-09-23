@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
-import { mostSimilar, VIBES, labelOf } from '../engine'
+import { Check, ChevronRight } from 'lucide-react'
+import { effectiveAffinity, mostSimilar, VIBES, WORLDS, labelOf } from '../engine'
 import { CATALOG, FITS, FIND_BY_ID, FINDS, SHOP_BY_ID } from '../data/catalog'
 import type { FindItem } from '../data/types'
 import { useStore } from '../state/store'
@@ -19,6 +19,8 @@ export function Sheets() {
       return <ShopSheet key={ui.sheet.id} id={ui.sheet.id} />
     case 'suggest':
       return <SuggestSheet />
+    case 'interests':
+      return <InterestsSheet />
     default:
       return null
   }
@@ -58,7 +60,7 @@ function ItemSheet({ id }: { id: string }) {
     <Sheet onClose={ui.close} label={item.name}>
       <div className="relative overflow-hidden rounded-[20px]">
         <ObjectArt art={item.art} className="block aspect-square w-full" />
-        {item.sponsored && <span className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[12px] font-semibold text-white">Partner</span>}
+        {item.sponsored && <span className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[0.75rem] font-semibold text-white">Partner</span>}
       </div>
       <h2 className="t-title mt-5">{item.name}</h2>
       <p className="t-sub mt-1 text-ink-2">
@@ -193,6 +195,42 @@ function SuggestSheet() {
           </button>
         </form>
       )}
+    </Sheet>
+  )
+}
+
+/** Add or remove interests any time. Adding is a strong signal; removing is neutral, not a dislike. */
+function InterestsSheet() {
+  const ui = useUI()
+  const store = useStore()
+  const eff = effectiveAffinity(store.profile)
+  return (
+    <Sheet onClose={ui.close} label="Your interests">
+      <h2 className="t-title">Your interests</h2>
+      <p className="mt-1 text-ink-2">Tap to add or remove. Your feed updates right away.</p>
+      <div className="mt-6 flex flex-col gap-6">
+        {WORLDS.map((w) => (
+          <div key={w.id} role="group" aria-labelledby={`edit-${w.id}`}>
+            <h3 id={`edit-${w.id}`} className="t-foot mb-2.5 font-semibold text-ink-2">
+              {w.label}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {VIBES.filter((v) => v.world === w.id).map((v) => {
+                const on = (eff[v.id] ?? 0) > 0.3
+                return (
+                  <button key={v.id} className="chip" aria-pressed={on} onClick={() => (on ? store.unfollow(v.id) : store.follow(v.id))}>
+                    {on && <Check size={15} strokeWidth={2.5} aria-hidden="true" />}
+                    {v.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-primary btn-large mt-8 w-full" onClick={ui.close}>
+        Done
+      </button>
     </Sheet>
   )
 }

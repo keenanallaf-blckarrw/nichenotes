@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import { Check, ChevronRight, Sparkles } from 'lucide-react'
 import { COMBO_BY_ID, comboRecipe, effectiveAffinity, labelOf, topVibes, vibeRead } from '../engine'
-import { FIND_BY_ID, MENTORS } from '../data/catalog'
+import { FIND_BY_ID, QUOTE_THEMES } from '../data/catalog'
+import type { Settings } from '../state/store'
 import { useStore } from '../state/store'
 import { useUI } from '../state/ui'
 import { ObjectArt } from '../components/ObjectArt'
@@ -18,7 +19,6 @@ export function Profile() {
   const eff = effectiveAffinity(store.profile)
   const savedFinds = store.saved.map((id) => FIND_BY_ID[id]).filter(Boolean)
   const savedOther = store.saved.map((id) => store.lookup(id)).filter((i) => i && i.type !== 'find')
-  const mentor = MENTORS.find((m) => m.id === store.mentor)
   const row = 'flex w-full items-center gap-3 border-b-[0.5px] border-line px-4 py-3 text-left last:border-b-0'
 
   return (
@@ -29,10 +29,13 @@ export function Profile() {
         <p className="t-foot font-semibold text-ink-2">Your taste</p>
         <h2 className="t-title2 mt-1">{read.headline}</h2>
         <p className="t-sub text-ink-2">{read.sub}</p>
+        <button className="btn btn-secondary mt-4 !bg-surface-2" onClick={() => ui.open({ kind: 'interests' })}>
+          Edit interests
+        </button>
         {interests.length > 0 && (
-          <div className="mt-5 flex flex-col gap-3">
+          <div className="mt-3 flex flex-col">
             {interests.map((v) => (
-              <Link key={v.id} to={`/i/${v.id}`} className="grid grid-cols-[112px_1fr] items-center gap-3">
+              <Link key={v.id} to={`/i/${v.id}`} className="grid min-h-[44px] grid-cols-[112px_1fr] items-center gap-3">
                 <span className="t-sub truncate">{labelOf(v.id)}</span>
                 <span className="h-1.5 rounded-full bg-accent-soft">
                   <span className="meter-fill block h-full rounded-full bg-accent" style={{ width: `${v.value * 100}%` }} />
@@ -44,7 +47,6 @@ export function Profile() {
       </section>
       <p className="t-foot mt-3 px-1 text-ink-3">
         Likes, saves, shop visits and time spent teach your feed. "Not interested" teaches it too. Interests you ignore slowly fade.
-        {mentor ? ` Your morning quotes come from ${mentor.name}.` : ''}
       </p>
 
       {store.profile.unlocked.length > 0 && (
@@ -121,6 +123,47 @@ export function Profile() {
         </section>
       )}
 
+      <section className="mt-10">
+        <SectionHeader title="Morning quotes" />
+        <p className="t-sub mt-1 text-ink-2">{store.themes.length ? 'Choose any themes.' : 'You get a mix of everything. Choose themes to narrow it down.'}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {QUOTE_THEMES.map((t) => {
+            const on = store.themes.includes(t.id)
+            return (
+              <button key={t.id} className="chip" aria-pressed={on} onClick={() => store.setThemes(on ? store.themes.filter((x) => x !== t.id) : [...store.themes, t.id])}>
+                {on && <Check size={15} strokeWidth={2.5} aria-hidden="true" />}
+                {t.name}
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <SectionHeader title="Display" />
+        <Segmented<Settings['appearance']>
+          label="Appearance"
+          value={store.settings.appearance}
+          options={[
+            ['auto', 'Automatic'],
+            ['light', 'Light'],
+            ['dark', 'Dark'],
+          ]}
+          onChange={(appearance) => store.setSettings({ appearance })}
+        />
+        <Segmented<Settings['textSize']>
+          label="Text size"
+          value={store.settings.textSize}
+          options={[
+            [1, 'Default'],
+            [1.12, 'Large'],
+            [1.25, 'Largest'],
+          ]}
+          onChange={(textSize) => store.setSettings({ textSize })}
+        />
+        <p className="t-foot mt-3 px-1 text-ink-3">NicheNotes also follows your device's text size, dark mode and reduced motion settings.</p>
+      </section>
+
       <section className="mt-10 overflow-hidden rounded-[14px] bg-surface">
         <Link to="/brands" className={row}>
           <span className="flex-1">For brands</span>
@@ -143,6 +186,27 @@ export function Profile() {
         )}
       </section>
       <p className="t-foot mt-3 px-1 text-ink-3">Preview version. Shops, products, usernames and posts are sample data, and everything stays on this device.</p>
+    </div>
+  )
+}
+
+function Segmented<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (v: T) => void }) {
+  return (
+    <div className="mt-4" role="radiogroup" aria-label={label}>
+      <p className="t-foot mb-2 font-semibold text-ink-2">{label}</p>
+      <div className="flex rounded-[12px] bg-surface p-1">
+        {options.map(([v, name]) => (
+          <button
+            key={String(v)}
+            role="radio"
+            aria-checked={value === v}
+            className={`min-h-[44px] flex-1 rounded-[9px] text-[0.9375rem] font-medium ${value === v ? 'bg-bg text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]' : 'text-ink-2'}`}
+            onClick={() => onChange(v)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

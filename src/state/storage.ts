@@ -1,5 +1,5 @@
 // Bump when stored shapes change; older data is simply ignored.
-const KEY = 'nichenotes:v2'
+const KEY = 'nichenotes:v3'
 
 // Storage can be missing or throw (private windows, sandboxed previews), so the
 // app must always work without it.

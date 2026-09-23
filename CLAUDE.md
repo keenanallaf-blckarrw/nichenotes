@@ -2,7 +2,10 @@
 
 Vite + React 19 + TypeScript + Tailwind v4 prototype. No backend; state persists to localStorage.
 
-Follow `docs/DESIGN.md` (Steve Jobs's principles): one primary action per card, system font plus one serif for quotes, one accent color, no uppercase labels or monospace, and plain universal English (Soccer not Football, jersey not kit, Clubs not Crews).
+Follow `docs/DESIGN.md` (Steve Jobs's principles): one primary action per card, system font plus one serif for quotes, one accent color, no uppercase labels or monospace, plain universal English (Soccer not Football, jersey not kit, Clubs not Crews), and copy that works for every kind of person.
+
+- Accessibility: font sizes in rem only (never px), icon buttons at least 44px, every control labeled.
+- Every interest must lead to real content; `src/data/catalog.test.ts` enforces it. When adding an interest, add finds, a club and posts in the same change.
 
 - `npm test` runs the engine tests (vitest). `npm run build` typechecks then builds.
 - `src/engine/` must stay free of React and browser APIs so it can move to a server or React Native app.

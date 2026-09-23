@@ -1,9 +1,9 @@
 # NicheNotes
 
-A For You feed for guys that learns your taste and leads you to great things nobody has heard of yet. You get:
+A For You feed for anyone that learns your taste and leads you to great things nobody has heard of yet. You get:
 
 - products and outfits from small shops
-- quotes worth keeping (Steve Jobs, Marcus Aurelius, Caesar…)
+- a quote worth keeping each morning (philosophers, athletes, artists, founders, leaders)
 - daily habits
 - clubs of people into the same things
 
@@ -28,11 +28,12 @@ npm run build      # typecheck + production build to dist/
 ```
 src/
   engine/        The recommendation engine. Pure TypeScript, no React, fully unit-tested.
-    taxonomy.ts    22 interests in 6 groups, plus 9 unlockable combinations (e.g. Retro Jerseys)
+    taxonomy.ts    59 interests in 9 groups, plus 20 unlockable combinations (e.g. Retro Jerseys)
     profile.ts     Learning: signal weights, decay, unlocks
     rank.ts        Feed ranking: relevance, variety, exploration, partner slots
     explain.ts     "Why am I seeing this?" lines and the taste summary
-  data/          Sample catalog: quotes (with sources), shops, finds, outfits, clubs, posts, daily habits
+  data/          Sample catalog: quotes (with sources), shops, finds, outfits, clubs, posts, daily habits.
+                 catalog.test.ts checks that every interest leads to real content.
   state/         App state (React context) and local persistence
   components/    Cards, sheets, the app shell, drawn product images
   pages/         Onboarding, For You, Discover, interest pages, Clubs, You, For brands

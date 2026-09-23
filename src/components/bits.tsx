@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 
 export function Logo() {
-  return <span className="text-[21px] font-semibold tracking-[-0.02em]">NicheNotes</span>
+  return <span className="text-[1.3125rem] font-semibold tracking-[-0.02em]">NicheNotes</span>
 }
 
 export function Avatar({ name, size = 36, square = false }: { name: string; size?: number; square?: boolean }) {

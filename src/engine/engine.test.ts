@@ -127,16 +127,16 @@ describe('ranking', () => {
 
   it('never stacks three of the same type in a row', () => {
     for (let s = 1; s < 8; s++) {
-      const types = batch(seeded({ stoicism: 1, discipline: 1 }), { seed: s }).map((r) => r.item.type)
+      const types = batch(seeded({ philosophy: 1, discipline: 1 }), { seed: s }).map((r) => r.item.type)
       for (let i = 2; i < types.length; i++) expect(types[i] === types[i - 1] && types[i] === types[i - 2]).toBe(false)
     }
   })
 
   it('keeps variety across batch boundaries', () => {
     for (let s = 1; s < 8; s++) {
-      const first = batch(seeded({ stoicism: 1, discipline: 1 }), { seed: s })
+      const first = batch(seeded({ philosophy: 1, discipline: 1 }), { seed: s })
       const recent = [first[first.length - 1].item]
-      const next = rankBatch({ catalog: CATALOG, profile: seeded({ stoicism: 1, discipline: 1 }), shownIds: new Set(first.map((r) => r.item.id)), excludeIds: new Set(), size: 10, seed: s + 10, now: NOW, recent })
+      const next = rankBatch({ catalog: CATALOG, profile: seeded({ philosophy: 1, discipline: 1 }), shownIds: new Set(first.map((r) => r.item.id)), excludeIds: new Set(), size: 10, seed: s + 10, now: NOW, recent })
       expect(next[0].item.type).not.toBe(recent[0].type)
     }
   })
@@ -173,12 +173,12 @@ describe('similar items', () => {
 describe('explanations', () => {
   it('names the combo recipe for combo picks', () => {
     const p = seeded({ soccer: 1, vintage: 1 })
-    expect(explain({ kind: 'combo', combo: 'retrojerseys', tags: ['soccer'] }, p)).toBe('Retro Jerseys · Soccer + Vintage')
+    expect(explain({ kind: 'combo', combo: 'retrojerseys', tags: ['soccer'] }, p)).toBe('Retro Jerseys · Soccer + Vintage & Thrift')
   })
 
   it('summarizes a profile by its top interests', () => {
-    const p = seeded({ soccer: 1, vintage: 1, stoicism: 0.6 })
-    expect(vibeRead(p).headline).toBe('Soccer, Vintage and Stoicism')
+    const p = seeded({ soccer: 1, vintage: 1, philosophy: 0.6 })
+    expect(vibeRead(p).headline).toBe('Soccer, Vintage & Thrift and Philosophy')
   })
 
   it('handles an empty profile', () => {

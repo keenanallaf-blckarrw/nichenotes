@@ -14,13 +14,13 @@ function today(): string {
 function DailyQuote() {
   const store = useStore()
   const quote = useMemo(() => {
-    const pool = QUOTES.filter((q) => !store.mentor || q.mentor === store.mentor)
+    const pool = store.themes.length ? QUOTES.filter((q) => store.themes.includes(q.theme)) : QUOTES
     const day = Math.floor(Date.now() / 86_400_000)
     return pool[day % pool.length]
-  }, [store.mentor])
+  }, [store.themes])
   return (
     <section className="pt-4 pb-2">
-      <blockquote className="t-quote text-[30px] leading-[1.2] sm:text-[34px]">{quote.translation ?? quote.text}</blockquote>
+      <blockquote className="t-quote text-[1.875rem] leading-[1.2] sm:text-[2.125rem]">{quote.translation ?? quote.text}</blockquote>
       {quote.translation && <p className="t-sub mt-2 text-ink-2 italic">{quote.text}</p>}
       <p className="t-sub mt-4 font-semibold">{quote.author}</p>
       <p className="t-foot text-ink-2">{quote.source}</p>

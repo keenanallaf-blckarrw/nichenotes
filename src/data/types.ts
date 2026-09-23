@@ -1,6 +1,6 @@
 import type { CatalogItem } from '../engine'
 
-export type MentorId = 'caesar' | 'marcus' | 'musashi' | 'cruyff' | 'bruce' | 'jobs'
+export type QuoteTheme = 'philosophers' | 'athletes' | 'creators' | 'founders' | 'leaders' | 'mindful'
 
 export interface QuoteItem extends CatalogItem {
   type: 'quote'
@@ -10,7 +10,8 @@ export interface QuoteItem extends CatalogItem {
   author: string
   /** Where it's from — work and passage when known. */
   source: string
-  mentor?: MentorId
+  /** Morning-quote theme people can choose during onboarding. */
+  theme: QuoteTheme
   /** Popularly credited but not traceable to the person's own words. */
   attributed?: boolean
 }
@@ -35,6 +36,28 @@ export type ArtKind =
   | 'shorts'
   | 'pan'
   | 'belt'
+  | 'ball'
+  | 'racket'
+  | 'mat'
+  | 'block'
+  | 'speaker'
+  | 'skateboard'
+  | 'comb'
+  | 'cushion'
+  | 'wallet'
+  | 'palette'
+  | 'camera'
+  | 'keyboard'
+  | 'headphones'
+  | 'gamepad'
+  | 'dice'
+  | 'frame'
+  | 'vase'
+  | 'plant'
+  | 'candle'
+  | 'lamp'
+  | 'lantern'
+  | 'bowl'
 
 export type ShirtPattern = 'plain' | 'bands' | 'stripes' | 'pinstripe' | 'sash' | 'halves' | 'chevron'
 
@@ -43,6 +66,8 @@ export interface ArtSpec {
   /** [light accent, main object color, detail color] */
   colors: [string, string, string]
   pattern?: ShirtPattern
+  /** Which ball to draw for kind 'ball'. */
+  variant?: 'basketball' | 'football' | 'tennis' | 'golf' | 'yarn'
   /** Short text printed on the object (a jersey number, a label). */
   mark?: string
 }

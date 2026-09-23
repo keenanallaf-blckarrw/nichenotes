@@ -11,6 +11,22 @@ import { Clubs, ClubPage } from './pages/Clubs'
 import { Profile } from './pages/Profile'
 import { Brands } from './pages/Brands'
 
+// A host page may already set a theme; "Automatic" hands control back to it.
+const HOST_THEME = typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : null
+
+/** Applies the person's appearance and text size choices to the whole page. */
+function DisplaySettings() {
+  const { settings } = useStore()
+  useEffect(() => {
+    const root = document.documentElement
+    const theme = settings.appearance === 'auto' ? HOST_THEME : settings.appearance
+    if (theme) root.setAttribute('data-theme', theme)
+    else root.removeAttribute('data-theme')
+    root.style.fontSize = `${settings.textSize * 100}%`
+  }, [settings.appearance, settings.textSize])
+  return null
+}
+
 // The single-file build runs inside sandboxed frames that don't own the URL,
 // so it keeps routes in memory. Everywhere else, hash routes work on any static host.
 const Router = import.meta.env.MODE === 'artifact' ? MemoryRouter : HashRouter
@@ -27,9 +43,16 @@ function ScrollAndSheetReset() {
 
 function Routed() {
   const store = useStore()
-  if (!store.onboarded) return <Onboarding />
+  if (!store.onboarded)
+    return (
+      <>
+        <DisplaySettings />
+        <Onboarding />
+      </>
+    )
   return (
     <Shell>
+      <DisplaySettings />
       <ScrollAndSheetReset />
       <Routes>
         <Route path="/" element={<Feed />} />

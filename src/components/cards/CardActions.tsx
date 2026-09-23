@@ -40,10 +40,10 @@ export function CardActions({ item, likes, why }: { item: AnyItem; likes?: numbe
     setTimeout(() => (setCopied(false), setMenu(false)), 1100)
   }
 
-  const row = 'flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[15px] hover:bg-surface-2'
+  const row = 'flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[0.9375rem] hover:bg-surface-2'
 
   return (
-    <div className="relative -mx-1.5 flex items-center gap-1">
+    <div className="relative -mx-3 flex items-center">
       <button className="icon-btn" aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => store.toggleLike(item)}>
         <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
         {likes !== undefined && <span>{compactLikes(likes + (liked ? 1 : 0))}</span>}
@@ -62,7 +62,7 @@ export function CardActions({ item, likes, why }: { item: AnyItem; likes?: numbe
                 Why am I seeing this? <Info size={17} className="text-ink-2" />
               </button>
             )}
-            {why && showWhy && <p className="px-4 pb-3 text-[13px] text-ink-2">{why}</p>}
+            {why && showWhy && <p className="px-4 pb-3 text-[0.8125rem] text-ink-2">{why}</p>}
             <button className={`${row} border-t-[0.5px] border-line`} onClick={share}>
               {copied ? 'Copied' : 'Share'} <Share size={17} className="text-ink-2" />
             </button>
