@@ -8,7 +8,10 @@ import { useStore } from '../state/store'
 import { useUI } from '../state/ui'
 import { ItemCard } from '../components/cards/Cards'
 import { ObjectArt } from '../components/ObjectArt'
-import { PageTitle, SectionHeader, money } from '../components/bits'
+import { PageTitle, SectionHeader, price } from '../components/bits'
+import { HuntList, HuntNote } from '../components/Hunt'
+import { HUNTS, huntsForProfile } from '../data/market'
+import { dayNumber } from '../data/time'
 
 function FindTile({ f }: { f: FindItem }) {
   const ui = useUI()
@@ -22,7 +25,7 @@ function FindTile({ f }: { f: FindItem }) {
       <span>
         <span className="t-foot line-clamp-2 font-semibold">{f.name}</span>
         <span className="t-foot block text-ink-2">
-          {SHOP_BY_ID[f.shop].name} · {money(f.price)}
+          {SHOP_BY_ID[f.shop].name} · {price(f)}
         </span>
       </span>
     </button>
@@ -64,6 +67,7 @@ export function Discover() {
   const searching = q.trim().length > 1
   const results = useMemo(() => (searching ? CATALOG.filter((i) => matches(i, q)).slice(0, 30) : []), [q, searching])
   const popular = useMemo(() => FINDS.filter((f) => !store.hidden.includes(f.id)).sort((a, b) => b.popularity - a.popularity).slice(0, 6), [store.hidden])
+  const hunts = useMemo(() => huntsForProfile(store.profile, dayNumber()), [store.profile])
   const combos = [...COMBOS].sort((a, b) => Number(store.profile.unlocked.includes(b.id)) - Number(store.profile.unlocked.includes(a.id)))
 
   return (
@@ -122,6 +126,15 @@ export function Discover() {
               ))}
             </div>
           </section>
+
+          {hunts.length > 0 && (
+            <section>
+              <SectionHeader title="Hunt for you" />
+              <p className="t-sub mt-1 text-ink-2">Searches picked from your taste. New ones each day.</p>
+              <HuntList hunts={hunts} />
+              <HuntNote />
+            </section>
+          )}
 
           <section>
             <SectionHeader title="Browse" />
@@ -226,6 +239,12 @@ export function InterestPage() {
           </div>
         </section>
       )}
+
+      <section className="mt-10">
+        <SectionHeader title="Hunt on Etsy and eBay" />
+        <HuntList hunts={(HUNTS[id] ?? []).map((query) => ({ vibe: id, label: combo?.label ?? vibe.label, query }))} showLabel={false} />
+        <HuntNote />
+      </section>
 
       {rest.length > 0 && (
         <section className="mt-10 flex flex-col gap-12">

@@ -82,7 +82,7 @@ describe('ranking', () => {
   })
 
   it('never shows excluded (hidden) items', () => {
-    const exclude = ['f-striped', 'f-keeper', 'q-quality']
+    const exclude = ['f-copa-jersey', 'f-woolscarf', 'q-quality']
     const items = batch(seeded({ soccer: 1, vintage: 1 }), { exclude })
     expect(items.map((r) => r.item.id)).not.toEqual(expect.arrayContaining(exclude))
   })
@@ -164,9 +164,9 @@ describe('ranking', () => {
 
 describe('similar items', () => {
   it('finds other retro jerseys for a retro jersey', () => {
-    const sims = mostSimilar(FIND_BY_ID['f-striped'], CATALOG, new Set(), 3, ['find'])
+    const sims = mostSimilar(FIND_BY_ID['f-copa-jersey'], CATALOG, new Set(), 3, ['find'])
     expect(sims.length).toBeGreaterThan(0)
-    for (const s of sims) expect(s.tags.soccer ?? 0).toBeGreaterThan(0)
+    for (const s of sims) expect((s.tags.soccer ?? 0) + (s.tags.retrojerseys ?? 0)).toBeGreaterThan(0)
   })
 })
 

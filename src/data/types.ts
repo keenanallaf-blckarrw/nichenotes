@@ -76,8 +76,11 @@ export interface Shop {
   id: string
   name: string
   blurb: string
-  location: string
+  /** Where the brand is based. Left out when the brand doesn't say. */
+  location?: string
   url: string
+  /** A real, independent brand. Everything else is invented sample data. */
+  real?: boolean
 }
 
 export interface FindItem extends CatalogItem {
@@ -85,6 +88,12 @@ export interface FindItem extends CatalogItem {
   name: string
   shop: string
   price: number
+  /** The price is the lowest of several sizes or options. */
+  priceFrom?: boolean
+  /** The product's own page at the shop. */
+  url?: string
+  /** What to search Etsy and eBay for to find more like this. */
+  hunt?: string
   blurb: string
   art: ArtSpec
 }

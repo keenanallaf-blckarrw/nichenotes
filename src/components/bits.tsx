@@ -69,7 +69,13 @@ export function Sheet({ onClose, children, label }: { onClose: () => void; child
 }
 
 export function money(n: number): string {
-  return `$${n.toLocaleString('en-US')}`
+  const cents = Number.isInteger(n) ? 0 : 2
+  return `$${n.toLocaleString('en-US', { minimumFractionDigits: cents, maximumFractionDigits: cents })}`
+}
+
+/** "$64", or "From $142" when there are several sizes or options. */
+export function price(item: { price: number; priceFrom?: boolean }): string {
+  return `${item.priceFrom ? 'From ' : ''}${money(item.price)}`
 }
 
 export function compact(n: number): string {

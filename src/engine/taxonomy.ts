@@ -45,6 +45,7 @@ export const WORLDS: World[] = [
 export const VIBES: Vibe[] = [
   { id: 'soccer', label: 'Soccer', world: 'sport', blurb: 'Game days, pickup games, retro jerseys.', adjacent: ['running', 'vintage', 'travel'] },
   { id: 'basketball', label: 'Basketball', world: 'sport', blurb: 'Pickup runs, shoes, highlights.', adjacent: ['sneakers', 'streetwear', 'lifting'] },
+  { id: 'baseball', label: 'Baseball', world: 'sport', blurb: 'Ballparks, box scores, wool caps.', adjacent: ['vintage', 'americanfootball', 'travel'] },
   { id: 'americanfootball', label: 'American Football', world: 'sport', blurb: 'Game days, tailgates, fantasy leagues.', adjacent: ['lifting', 'cooking', 'cars'] },
   { id: 'tennis', label: 'Racket Sports', world: 'sport', blurb: 'Tennis, padel and pickleball.', adjacent: ['sneakers', 'golf', 'running'] },
   { id: 'golf', label: 'Golf', world: 'sport', blurb: 'Early tee times and quiet courses.', adjacent: ['tailoring', 'watches', 'tennis'] },
@@ -113,9 +114,9 @@ export const VIBES: Vibe[] = [
 ]
 
 export const COMBOS: Combo[] = [
-  { id: 'retrojerseys', label: 'Retro Jerseys', requires: [['soccer', 'basketball', 'americanfootball'], ['vintage', 'streetwear']], blurb: 'Classic sports jerseys worn as everyday style.' },
+  { id: 'retrojerseys', label: 'Retro Jerseys', requires: [['soccer', 'basketball', 'baseball', 'americanfootball'], ['vintage', 'streetwear']], blurb: 'Classic sports jerseys worn as everyday style.' },
   { id: 'courtstyle', label: 'Court Style', requires: [['basketball', 'tennis'], ['sneakers', 'streetwear']], blurb: 'What people wear on the court, worn everywhere else.' },
-  { id: 'stadiumtravel', label: 'Stadium Travel', requires: [['soccer', 'basketball', 'americanfootball'], ['travel']], blurb: 'Seeing a game in every city you visit.' },
+  { id: 'stadiumtravel', label: 'Stadium Travel', requires: [['soccer', 'basketball', 'baseball', 'americanfootball'], ['travel']], blurb: 'Seeing a game in every city you visit.' },
   { id: 'outdoorstyle', label: 'Outdoor Style', requires: [['trail', 'camping'], ['streetwear', 'travel']], blurb: 'Hiking gear that looks good in the city.' },
   { id: 'apothecary', label: 'Apothecary', requires: [['skincare', 'grooming', 'haircare'], ['fragrance', 'recovery']], blurb: 'Self-care made by hand, in small batches.' },
   { id: 'selfcaresunday', label: 'Self-Care Sunday', requires: [['skincare', 'haircare', 'makeup'], ['meditation', 'recovery', 'tea']], blurb: 'A slow day to look after yourself.' },

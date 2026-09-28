@@ -16,7 +16,7 @@ The moat is **taste + trust**: an engine that actually gets you, and a feed that
 
 | Feature | What it proves |
 |---|---|
-| 59 interests in 9 groups, with search, editable any time | There's something for everyone, not just one type of person |
+| 60 interests in 9 groups, with search, editable any time | There's something for everyone, not just one type of person |
 | Two-step onboarding: pick your interests, then any quote themes (or a mix of all) | Cold start in under 30 seconds |
 | For You feed mixing finds, outfits, quotes, club posts and daily habits | The hub: shopping, wellness and social in one scroll |
 | Learning engine: likes, saves, shop taps, time spent, "Not interested" | The feed visibly changes as you use it |

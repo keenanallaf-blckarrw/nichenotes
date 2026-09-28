@@ -42,7 +42,7 @@ npm run build:artifact # the whole app as one file: dist-artifact/nichenotes.htm
 ```
 src/
   engine/        The recommendation engine. Pure TypeScript, no React, fully unit-tested.
-    taxonomy.ts    59 interests in 9 groups, plus 20 unlockable combinations (e.g. Retro Jerseys)
+    taxonomy.ts    60 interests in 9 groups, plus 20 unlockable combinations (e.g. Retro Jerseys)
     profile.ts     Learning: signal weights, decay, unlocks
     rank.ts        Feed ranking: relevance, variety, exploration, partner slots
     explain.ts     "Why am I seeing this?" lines and the taste summary
@@ -73,6 +73,12 @@ In every ten items:
 - two slots explore interests you haven't tried yet
 - one slot can go to a paid partner, but only if the product genuinely matches you
 
+## Products
+
+`src/data/brands.ts` holds real, independent brands (Teōtl, Laurel, LVNEA, Portuguese Flannel, Ebbets and more), checked against each brand's site in September 2026. The bar: small makers, natural materials, quality over quantity, nothing over $500. Their Shop button opens the brand's real store.
+
+`src/data/market.ts` sends people to Etsy and eBay searches picked from their taste ("Hunt for you" on Discover, and on every interest and product page), capped at $500.
+
 ## Sample data
 
-Shops, products, usernames and posts are invented for the prototype. Quotes are real and carry their sources; lines that are only popularly credited are marked "Attributed".
+Interests without real brands yet still use invented sample shops, marked as samples in the app. Usernames and posts are invented too. Quotes are real and carry their sources; lines that are only popularly credited are marked "Attributed".

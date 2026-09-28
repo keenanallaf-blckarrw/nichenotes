@@ -6,7 +6,9 @@ import type { FindItem } from '../data/types'
 import { useStore } from '../state/store'
 import { useUI } from '../state/ui'
 import { ObjectArt } from './ObjectArt'
-import { Sheet, money } from './bits'
+import { Sheet, price } from './bits'
+import { HuntLinks } from './Hunt'
+import { huntFor } from '../data/market'
 import { CardActions } from './cards/CardActions'
 import { AreaSheet, EventSheet, HostSheet } from './LocalSheets'
 
@@ -45,7 +47,7 @@ function Shelf({ title, finds }: { title: string; finds: FindItem[] }) {
           <button key={f.id} className="flex w-[136px] shrink-0 flex-col gap-1.5 text-left" onClick={() => (store.track('open', f), ui.open({ kind: 'item', id: f.id }))}>
             <ObjectArt art={f.art} className="block aspect-square w-full rounded-[14px]" />
             <span className="t-foot line-clamp-2 font-medium">{f.name}</span>
-            <span className="t-foot text-ink-2">{money(f.price)}</span>
+            <span className="t-foot text-ink-2">{price(f)}</span>
           </button>
         ))}
       </div>
@@ -62,6 +64,8 @@ function ItemSheet({ id }: { id: string }) {
   const fromShop = FINDS.filter((f) => f.shop === item.shop && f.id !== item.id).slice(0, 6)
   const similar = mostSimilar(item, CATALOG, new Set(store.hidden), 8, ['find']) as FindItem[]
   const inFits = FITS.filter((f) => f.findIds.includes(item.id))
+  const topTag = Object.entries(item.tags).sort((a, b) => b[1] - a[1])[0]?.[0]
+  const hunt = item.hunt ?? (topTag ? huntFor(topTag).query : item.name)
 
   return (
     <Sheet onClose={ui.close} label={item.name}>
@@ -71,9 +75,10 @@ function ItemSheet({ id }: { id: string }) {
       </div>
       <h2 className="t-title mt-5">{item.name}</h2>
       <p className="t-sub mt-1 text-ink-2">
-        {shop.name} · {shop.location}
+        {shop.name}
+        {shop.location && ` · ${shop.location}`}
       </p>
-      <p className="t-title2 mt-3">{money(item.price)}</p>
+      <p className="t-title2 mt-3">{price(item)}</p>
       <p className="mt-2 text-ink-2">{item.blurb}</p>
       <button className="btn btn-primary btn-large mt-5 w-full" onClick={() => (store.shopClick(item), ui.open({ kind: 'shop', id: item.id }))}>
         Shop at {shop.name}
@@ -87,9 +92,17 @@ function ItemSheet({ id }: { id: string }) {
         <p className="t-sub mt-0.5 text-ink-2">{shop.blurb}</p>
       </section>
 
+      <section className="mt-8 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="t-headline">Find more like this</h3>
+          <p className="t-foot text-ink-2">Vintage and handmade, under $500</p>
+        </div>
+        <HuntLinks query={hunt} tags={item.tags} />
+      </section>
+
       {inFits.length > 0 && (
         <section className="mt-8">
-          <h3 className="t-headline">Wear it with</h3>
+          <h3 className="t-headline">{inFits.some((f) => f.label === 'Outfit') ? 'Wear it with' : 'Goes well with'}</h3>
           <div className="mt-3 flex flex-col">
             {inFits.map((fit) => (
               <div key={fit.id} className="flex items-center gap-3 border-b-[0.5px] border-line py-3 last:border-b-0">
@@ -126,15 +139,29 @@ function ShopSheet({ id }: { id: string }) {
         <ObjectArt art={item.art} className="block size-28 rounded-[20px]" />
         <h2 className="t-title mt-5">Go to {shop.name}</h2>
         <p className="t-sub mt-1 text-ink-2">
-          {item.name} · {money(item.price)}
+          {item.name} · {price(item)}
         </p>
-        <p className="t-sub mt-5 max-w-[34ch] text-ink-2">
-          In the live app, this opens {shop.name}'s website. You buy directly from them, and NicheNotes earns a small commission at no cost to you.
-        </p>
-        <p className="t-foot mt-3 text-ink-3">This is a preview. {shop.name} is a sample shop.</p>
-        <button className="btn btn-primary btn-large mt-7 w-full" onClick={ui.close}>
-          Done
-        </button>
+        {shop.real ? (
+          <>
+            <p className="t-sub mt-5 max-w-[34ch] text-ink-2">You buy directly from {shop.name}, a small independent brand. Prices can change, so check theirs before you order.</p>
+            <a className="btn btn-primary btn-large mt-7 w-full" href={item.url ?? shop.url} target="_blank" rel="noopener noreferrer" onClick={ui.close}>
+              Open {shop.name}
+            </a>
+            <button className="btn btn-secondary btn-large mt-2 w-full" onClick={ui.close}>
+              Not now
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="t-sub mt-5 max-w-[34ch] text-ink-2">
+              In the live app, this opens {shop.name}'s website. You buy directly from them, and NicheNotes earns a small commission at no cost to you.
+            </p>
+            <p className="t-foot mt-3 text-ink-3">This is a preview. {shop.name} is a sample shop.</p>
+            <button className="btn btn-primary btn-large mt-7 w-full" onClick={ui.close}>
+              Done
+            </button>
+          </>
+        )}
       </div>
     </Sheet>
   )

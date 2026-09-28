@@ -242,6 +242,9 @@ function useStoreValue() {
     [track, injectSimilar],
   )
 
+  /** Someone went looking for more on Etsy or eBay: a strong sign they want this. */
+  const hunt = useCallback((tags: Tags) => signal('shop', tags), [signal])
+
   const ritual = useCallback(
     (item: AnyItem, done: boolean) => {
       track(done ? 'ritual_done' : 'ritual_skip', item)
@@ -462,6 +465,7 @@ function useStoreValue() {
     dismiss,
     impression,
     shopClick,
+    hunt,
     ritual,
     addPost,
     follow,

@@ -6,7 +6,7 @@ import type { AnyItem, EventItem, FindItem, FitItem, PostItem, QuoteItem, Ritual
 import { useStore } from '../../state/store'
 import { useUI } from '../../state/ui'
 import { ObjectArt } from '../ObjectArt'
-import { Avatar, DateTile, eventTime, money, timeAgo } from '../bits'
+import { Avatar, DateTile, eventTime, money, price, timeAgo } from '../bits'
 import { CardActions } from './CardActions'
 
 /** Why text for a card: shown only when notable, otherwise it lives in the ••• menu. */
@@ -52,7 +52,7 @@ export function FindCard({ item, why }: { item: FindItem; why?: Why }) {
         <div className="min-w-0">
           <h3 className="t-headline">{item.name}</h3>
           <p className="t-sub text-ink-2">
-            {shop.name} · {money(item.price)}
+            {shop.name} · {price(item)}
           </p>
         </div>
         <button className="btn btn-primary shrink-0" onClick={() => (store.shopClick(item), ui.open({ kind: 'shop', id: item.id }))}>
@@ -73,6 +73,7 @@ export function FitCard({ item, why }: { item: FitItem; why?: Why }) {
   const store = useStore()
   const finds = item.findIds.map((id) => FIND_BY_ID[id]).filter(Boolean)
   const total = finds.reduce((s, f) => s + f.price, 0)
+  const from = finds.some((f) => f.priceFrom)
   return (
     <article>
       <p className="t-foot font-semibold text-ink-2">{item.label}</p>
@@ -86,7 +87,7 @@ export function FitCard({ item, why }: { item: FitItem; why?: Why }) {
         ))}
       </div>
       <p className="t-foot mt-2 text-ink-2">
-        {finds.length} pieces · {money(total)} total
+        {finds.length} pieces · {from ? 'from ' : ''}{money(total)} total
       </p>
       <div className="mt-1 flex flex-col gap-0.5">
         <WhyLine why={why} />

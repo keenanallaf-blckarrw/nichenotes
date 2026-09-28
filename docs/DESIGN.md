@@ -29,7 +29,7 @@ NicheNotes is designed the way Steve Jobs described good products. Each principl
 
 Apple builds accessibility into every product, because a product that shuts people out is not finished.
 
-- **For every kind of person.** There are 59 interests, not just one lifestyle. Copy never assumes gender, age, body or background.
+- **For every kind of person.** There are 60 interests, not just one lifestyle. Copy never assumes gender, age, body or background.
 - **Readable.** All text is sized in rem, so it grows with the text-size setting in You › Display and with the device's own setting. Secondary text meets WCAG AA contrast.
 - **Easy to tap.** Every icon button is at least 44 × 44 points.
 - **Respectful of settings.** Dark mode and reduced motion follow the device automatically unless the person chooses otherwise.
