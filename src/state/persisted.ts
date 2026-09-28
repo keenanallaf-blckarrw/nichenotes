@@ -81,8 +81,14 @@ export function boot(): Persisted {
   const saved = storage.load<Persisted>()
   // Fill in fields added since the data was saved, so nobody loses their taste profile.
   const base = saved?.v === 3 ? { ...fresh(), ...saved } : fresh()
-  // New session: fade stale interests, then freeze a snapshot for trend arrows.
-  return { ...base, profile: takeSnapshot(decayProfile(base.profile, Date.now())) }
+  try {
+    // New session: fade stale interests, then freeze a snapshot for trend arrows.
+    return { ...base, profile: takeSnapshot(decayProfile(base.profile, Date.now())) }
+  } catch {
+    // Saved data we can't read (edited by hand, or cut off mid-write): start fresh
+    // but keep display settings, which are about the person's needs.
+    return { ...fresh(), settings: { ...fresh().settings, ...base.settings } }
+  }
 }
 
 export function toggle(list: string[], id: string, on: boolean): string[] {

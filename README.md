@@ -14,14 +14,28 @@ This is a **working prototype**: a phone-first web app with a real recommendatio
 
 ## Run it
 
+You need [Node.js](https://nodejs.org) (version 20 or newer) installed once.
+
+1. Open Terminal and go to the project: `cd ~/nichenotes`
+2. Install the building blocks (first time only): `npm install`
+3. Start the app: `npm run dev`
+4. Open http://localhost:5173 in your browser. Press Control + C in Terminal to stop.
+
+Other commands:
+
 ```bash
-npm install
-npm run dev        # http://localhost:5173
-npm test           # engine unit tests
-npm run build      # typecheck + production build to dist/
+npm test               # run the automated tests
+npm run build          # check types and build the site into dist/
+npm run deploy         # test, build and publish to GitHub Pages
+npm run build:artifact # the whole app as one file: dist-artifact/nichenotes.html
 ```
 
-`npm run build:artifact` produces `dist-artifact/nichenotes.html`: the whole app as one self-contained file, handy for sharing a clickable demo.
+## Demo tips
+
+- **Live link:** https://keenanallaf-blckarrw.github.io/nichenotes/ (after `npm run deploy`).
+- **Put it on your phone's home screen.** Open the link in Safari, tap Share, then *Add to Home Screen*. It opens full screen with its own icon, like an app.
+- **Works offline.** After one visit, the hosted version keeps working with no connection.
+- **Fresh start for each demo.** You › *Start over* resets onboarding; *Skip* on the first screen loads a sample taste.
 
 ## What's inside
 

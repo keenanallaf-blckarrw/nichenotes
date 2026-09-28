@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bookmark, EyeOff, Flag, Heart, Info, MoreHorizontal, Share, VolumeX } from 'lucide-react'
 import { labelOf, VIBE_BY_ID } from '../../engine'
+import { itemName } from '../../data/catalog'
 import type { AnyItem } from '../../data/types'
 import { useStore } from '../../state/store'
 
@@ -30,9 +31,21 @@ export function CardActions({ item, likes, why }: { item: AnyItem; likes?: numbe
 
   const share = async () => {
     store.track('share', item)
-    const text = item.type === 'quote' ? `"${item.translation ?? item.text}" (${item.author})` : 'Found this on NicheNotes'
+    const text = shareText(item)
+    // The single-file build runs in a sandboxed frame whose address isn't worth sharing.
+    const url = import.meta.env.MODE === 'artifact' ? undefined : location.href.split('#')[0]
+    // Phones get the system share sheet; everything else copies to the clipboard.
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'NicheNotes', text, url })
+        setMenu(false)
+        return
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+      }
+    }
     try {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(url ? `${text} ${url}` : text)
     } catch {
       /* Clipboard can be refused; the share still counts as a signal. */
     }
@@ -84,6 +97,12 @@ export function CardActions({ item, likes, why }: { item: AnyItem; likes?: numbe
       </div>
     </div>
   )
+}
+
+function shareText(item: AnyItem): string {
+  if (item.type === 'quote') return `"${item.translation ?? item.text}" (${item.author})`
+  if (item.type === 'post') return `"${item.text}" (@${item.author} on NicheNotes)`
+  return `${itemName(item)}, found on NicheNotes`
 }
 
 function compactLikes(n: number): string {

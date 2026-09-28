@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import { dayKey, streak } from './time'
+import { dayKey, dayNumber, streak } from './time'
 
 describe('dayKey', () => {
   it('uses the local calendar day, not UTC', () => {
     // 11:30 pm local time stays on the 5th wherever the test runs.
     expect(dayKey(new Date(2026, 8, 5, 23, 30))).toBe('2026-09-05')
     expect(dayKey(new Date(2026, 0, 1, 0, 5))).toBe('2026-01-01')
+  })
+})
+
+describe('dayNumber', () => {
+  it('changes at local midnight, not in the evening', () => {
+    const evening = dayNumber(new Date(2026, 8, 5, 23, 59))
+    expect(dayNumber(new Date(2026, 8, 5, 0, 1))).toBe(evening)
+    expect(dayNumber(new Date(2026, 8, 6, 0, 1))).toBe(evening + 1)
   })
 })
 

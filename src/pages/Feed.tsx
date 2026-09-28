@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { explain, isNotable } from '../engine'
 import { QUOTES, itemName } from '../data/catalog'
+import { dayNumber } from '../data/time'
 import type { AnyItem } from '../data/types'
 import { useStore, type FeedEntry } from '../state/store'
 import { ItemCard, UnlockCard } from '../components/cards/Cards'
@@ -17,8 +18,7 @@ function DailyQuote() {
   const store = useStore()
   const quote = useMemo(() => {
     const pool = store.themes.length ? QUOTES.filter((q) => store.themes.includes(q.theme)) : QUOTES
-    const day = Math.floor(Date.now() / 86_400_000)
-    return pool[day % pool.length]
+    return pool[dayNumber() % pool.length]
   }, [store.themes])
   return (
     <section className="pt-4 pb-2">

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { HashRouter, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { StoreProvider, useStore } from './state/store'
 import { UIProvider, useUI } from './state/ui'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { Shell } from './components/Shell'
 import { Sheets } from './components/Sheets'
 import { Onboarding } from './pages/Onboarding'
@@ -24,6 +25,19 @@ function DisplaySettings() {
     if (theme) root.setAttribute('data-theme', theme)
     else root.removeAttribute('data-theme')
     root.style.fontSize = `${settings.textSize * 100}%`
+    // Match the phone's status bar to the chosen appearance, not just the device's.
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim()
+    for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+      meta.dataset.media ??= meta.media
+      meta.dataset.color ??= meta.content
+      if (theme && bg) {
+        meta.media = ''
+        meta.content = bg
+      } else {
+        meta.media = meta.dataset.media
+        meta.content = meta.dataset.color
+      }
+    }
   }, [settings.appearance, settings.textSize])
   return null
 }
@@ -73,12 +87,14 @@ function Routed() {
 
 export function App() {
   return (
-    <StoreProvider>
-      <UIProvider>
-        <Router>
-          <Routed />
-        </Router>
-      </UIProvider>
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <UIProvider>
+          <Router>
+            <Routed />
+          </Router>
+        </UIProvider>
+      </StoreProvider>
+    </ErrorBoundary>
   )
 }

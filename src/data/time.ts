@@ -14,6 +14,11 @@ export function dayKey(date: Date = new Date()): string {
   return `${date.getFullYear()}-${m}-${d}`
 }
 
+/** Whole days since 1970 on the local calendar, so daily picks change at the person's midnight. */
+export function dayNumber(date: Date = new Date()): number {
+  return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY)
+}
+
 /**
  * Days in a row with at least one entry in the log. A streak still counts until
  * the day ends, so it runs from today, or from yesterday if today is still empty.

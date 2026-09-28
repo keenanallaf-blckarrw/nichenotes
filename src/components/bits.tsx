@@ -9,7 +9,7 @@ export function Avatar({ name, size = 36, square = false }: { name: string; size
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center bg-surface-2 font-semibold text-ink-2 ${square ? 'rounded-[12px]' : 'rounded-full'}`}
-      style={{ width: size, height: size, fontSize: size * 0.42 }}
+      style={{ width: size, height: size, fontSize: `${(size * 0.42) / 16}rem` }}
       aria-hidden="true"
     >
       {name.replace(/[^a-z]/gi, '').slice(0, 1).toUpperCase() || '?'}
