@@ -94,6 +94,8 @@ export interface FindItem extends CatalogItem {
   price: number
   /** The price is the lowest of several sizes or options. */
   priceFrom?: boolean
+  /** A US-dollar estimate: the shop prices in another currency. */
+  approx?: boolean
   /** The product's own page at the shop. */
   url?: string
   /** What to search Etsy and eBay for to find more like this. */

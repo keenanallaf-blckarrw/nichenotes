@@ -73,9 +73,9 @@ export function money(n: number): string {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: cents, maximumFractionDigits: cents })}`
 }
 
-/** "$64", or "From $142" when there are several sizes or options. */
-export function price(item: { price: number; priceFrom?: boolean }): string {
-  return `${item.priceFrom ? 'From ' : ''}${money(item.price)}`
+/** "$64", "From $142" when there are several sizes, or "About $240" when the shop prices in another currency. */
+export function price(item: { price: number; priceFrom?: boolean; approx?: boolean }): string {
+  return `${item.priceFrom ? 'From ' : item.approx ? 'About ' : ''}${money(item.price)}`
 }
 
 export function compact(n: number): string {
