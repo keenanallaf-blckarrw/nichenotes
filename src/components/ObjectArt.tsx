@@ -23,6 +23,10 @@ export function ObjectArt({ art, className = '' }: { art: ArtSpec; className?: s
 const SHIRT = 'M62 40 L86 30 Q100 42 114 30 L138 40 L170 66 L152 90 L140 82 L140 172 L60 172 L60 82 L48 90 L30 66 Z'
 const JACKET = 'M62 38 L86 30 L100 44 L114 30 L138 38 L166 70 L174 162 L154 164 L146 94 L144 172 L56 172 L54 94 L46 164 L26 162 L34 70 Z'
 
+const HOODIE = 'M62 40 L84 32 Q100 46 116 32 L138 40 L166 70 L174 162 L154 164 L146 96 L144 172 L56 172 L54 96 L46 164 L26 162 L34 70 Z'
+const DRESS = 'M80 30 L92 28 Q100 40 108 28 L120 30 L130 58 L118 64 L116 86 L152 172 L48 172 L84 86 L82 64 L70 58 Z'
+const PANTS = 'M64 30 L136 30 L150 172 L110 172 L100 78 L90 172 L50 172 Z'
+
 function pattern(kind: ShirtPattern | undefined, detail: string): ReactNode {
   switch (kind) {
     case 'bands':
@@ -91,6 +95,54 @@ function draw(art: ArtSpec, main: string, detail: string, bg: string, uid: strin
         </g>
       )
     }
+    case 'hoodie':
+      return (
+        <g>
+          <path d="M72 42 Q100 2 128 42 Q100 58 72 42 Z" fill={main} />
+          <path d={HOODIE} fill={main} />
+          <path d="M80 42 Q100 14 120 42 Q100 52 80 42 Z" fill="#000" opacity="0.22" />
+          <path d={HOODIE} fill="none" stroke="#000" strokeOpacity="0.14" strokeWidth="1.5" />
+          <path d="M94 50 L92 82 M106 50 L108 82" stroke={detail} strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M72 126 L128 126 L136 156 L64 156 Z" fill="none" stroke="#000" strokeOpacity="0.2" strokeWidth="1.5" />
+          <rect x="56" y="164" width="88" height="8" fill="#000" opacity="0.08" />
+        </g>
+      )
+    case 'beanie':
+      return (
+        <g>
+          <path d="M52 132 Q52 58 100 56 Q148 58 148 132 Z" fill={main} />
+          {[70, 85, 100, 115, 130].map((x) => (
+            <path key={x} d={`M${x} 128 Q${x + (x - 100) * 0.1} 90 ${100 + (x - 100) * 0.4} 60`} fill="none" stroke="#000" strokeOpacity="0.1" strokeWidth="2" />
+          ))}
+          <rect x="46" y="126" width="108" height="34" rx="6" fill={main} />
+          <rect x="46" y="126" width="108" height="34" rx="6" fill="#000" opacity="0.1" />
+          <rect x="88" y="134" width="24" height="16" rx="2" fill={detail} opacity="0.85" />
+        </g>
+      )
+    case 'dress':
+      return (
+        <g>
+          <path d={DRESS} fill={main} />
+          <path d={DRESS} fill="none" stroke="#000" strokeOpacity="0.12" strokeWidth="1.5" />
+          <path d="M92 28 Q100 40 108 28" fill="none" stroke="#000" strokeOpacity="0.25" strokeWidth="3" />
+          <path d="M84 86 Q100 92 116 86" fill="none" stroke={detail} strokeWidth="4" strokeLinecap="round" />
+          <path d="M100 42 L100 86" stroke="#000" strokeOpacity="0.12" strokeWidth="1.5" />
+          {[52, 60].map((y) => (
+            <circle key={y} cx="100" cy={y} r="1.8" fill={detail} />
+          ))}
+          <path d="M70 172 L92 100 M130 172 L108 100" stroke="#000" strokeOpacity="0.07" strokeWidth="2" />
+        </g>
+      )
+    case 'pants':
+      return (
+        <g>
+          <path d={PANTS} fill={main} />
+          <path d={PANTS} fill="none" stroke="#000" strokeOpacity="0.14" strokeWidth="1.5" />
+          <rect x="64" y="30" width="72" height="10" fill="#000" opacity="0.12" />
+          <path d="M82 40 L78 172 M118 40 L122 172" stroke={detail} strokeOpacity="0.5" strokeWidth="1.5" />
+          <path d="M100 40 L100 70" stroke="#000" strokeOpacity="0.18" strokeWidth="1.5" />
+        </g>
+      )
     case 'scarf':
       return (
         <g transform="rotate(-18 100 100)">
