@@ -96,6 +96,8 @@ export interface FindItem extends CatalogItem {
   priceFrom?: boolean
   /** A US-dollar estimate: the shop prices in another currency. */
   approx?: boolean
+  /** What the shop charges in its own currency, when it isn't US dollars. The link checker compares against this. */
+  shopPrice?: { amount: number; currency: string }
   /** The product's own page at the shop. */
   url?: string
   /** What to search Etsy and eBay for to find more like this. */

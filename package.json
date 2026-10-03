@@ -8,9 +8,11 @@
     "build": "tsc --noEmit && vite build",
     "build:artifact": "vite build --mode artifact && node scripts/artifact.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tools",
     "test": "vitest run",
-    "deploy": "npm test && npm run build && gh-pages -d dist"
+    "deploy": "npm test && npm run build && gh-pages -d dist",
+    "check:links": "tsx tools/catalog/check-links.ts",
+    "lookup": "tsx tools/catalog/lookup.ts"
   },
   "dependencies": {
     "lucide-react": "^1.47.0",
@@ -20,11 +22,13 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "gh-pages": "^6.3.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vite-plugin-singlefile": "^2.3.3",
