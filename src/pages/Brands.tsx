@@ -5,7 +5,7 @@ import { PageTitle, SectionHeader } from '../components/bits'
 
 // Illustrative numbers for a sample partner, to show what a brand would see.
 const SAMPLE = {
-  shop: 'Final Whistle Archive',
+  shop: 'A retro jersey shop',
   period: 'Last 30 days',
   tiles: [
     { label: 'People reached', value: '48.2K', note: 'Up 18% from the 30 days before' },

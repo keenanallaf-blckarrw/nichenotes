@@ -27,6 +27,10 @@ export function formatPrice(amount: number, currency = 'USD'): string {
 export function judgeLink(link: string, result: LinkResult, kind: 'product' | 'shop'): Issue[] {
   if (result.error) return [{ severity: 'problem', message: `Couldn't open the page: ${result.error}.` }]
   if (!result.status || !result.finalUrl) return [{ severity: 'problem', message: 'Got no answer from the site.' }]
+  if ([401, 403, 429].includes(result.status)) {
+    // Many shops turn away automated visitors while the page works fine in a browser.
+    return [{ severity: 'note', message: `The shop blocks automatic checks (${result.status}). Open the link to make sure it works.` }]
+  }
   if (result.status >= 400) {
     const what = result.status === 404 || result.status === 410 ? 'Page not found' : 'The site returned an error'
     return [{ severity: 'problem', message: `${what} (${result.status}).` }]

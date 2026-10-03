@@ -38,6 +38,10 @@ export type ArtKind =
   | 'dress'
   | 'hoodie'
   | 'beanie'
+  | 'glove'
+  | 'pen'
+  | 'skirt'
+  | 'paddle'
   | 'pan'
   | 'belt'
   | 'ball'
@@ -71,7 +75,7 @@ export interface ArtSpec {
   colors: [string, string, string]
   pattern?: ShirtPattern
   /** Which ball to draw for kind 'ball'. */
-  variant?: 'basketball' | 'football' | 'tennis' | 'golf' | 'yarn'
+  variant?: 'basketball' | 'football' | 'soccer' | 'tennis' | 'golf' | 'yarn'
   /** Short text printed on the object (a jersey number, a label). */
   mark?: string
 }
@@ -83,8 +87,6 @@ export interface Shop {
   /** Where the brand is based. Left out when the brand doesn't say. */
   location?: string
   url: string
-  /** A real, independent brand. Everything else is invented sample data. */
-  real?: boolean
 }
 
 export interface FindItem extends CatalogItem {

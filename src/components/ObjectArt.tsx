@@ -25,6 +25,7 @@ const JACKET = 'M62 38 L86 30 L100 44 L114 30 L138 38 L166 70 L174 162 L154 164 
 
 const HOODIE = 'M62 40 L84 32 Q100 46 116 32 L138 40 L166 70 L174 162 L154 164 L146 96 L144 172 L56 172 L54 96 L46 164 L26 162 L34 70 Z'
 const DRESS = 'M80 30 L92 28 Q100 40 108 28 L120 30 L130 58 L118 64 L116 86 L152 172 L48 172 L84 86 L82 64 L70 58 Z'
+const SKIRT = 'M70 52 L130 52 L156 160 L44 160 Z'
 const PANTS = 'M64 30 L136 30 L150 172 L110 172 L100 78 L90 172 L50 172 Z'
 
 function pattern(kind: ShirtPattern | undefined, detail: string): ReactNode {
@@ -119,6 +120,28 @@ function draw(art: ArtSpec, main: string, detail: string, bg: string, uid: strin
           <rect x="88" y="134" width="24" height="16" rx="2" fill={detail} opacity="0.85" />
         </g>
       )
+    case 'glove':
+      return (
+        <g>
+          <ellipse cx="66" cy="104" rx="16" ry="24" fill={main} stroke="#000" strokeOpacity="0.14" strokeWidth="1.5" />
+          <path d="M70 70 Q70 38 104 38 Q142 38 142 80 L142 118 Q142 140 122 146 L80 146 Q66 138 66 118 Z" fill={main} />
+          <path d="M70 70 Q70 38 104 38 Q142 38 142 80 L142 118 Q142 140 122 146 L80 146 Q66 138 66 118 Z" fill="none" stroke="#000" strokeOpacity="0.14" strokeWidth="1.5" />
+          <path d="M84 60 Q104 52 126 62" fill="none" stroke="#000" strokeOpacity="0.12" strokeWidth="2" />
+          <rect x="78" y="146" width="48" height="26" rx="4" fill={detail} />
+          <path d="M84 156 L120 156 M84 164 L120 164" stroke="#000" strokeOpacity="0.15" strokeWidth="1.5" />
+        </g>
+      )
+    case 'pen':
+      return (
+        <g transform="rotate(-38 100 104)">
+          <rect x="58" y="94" width="76" height="20" rx="9" fill={main} />
+          <rect x="124" y="92" width="34" height="24" rx="10" fill={detail} />
+          <path d="M130 92 L158 92" stroke="#000" strokeOpacity="0.2" strokeWidth="2" />
+          <path d="M58 98 L36 104 L58 110 Z" fill="#C9A24A" />
+          <line x1="36" y1="104" x2="50" y2="104" stroke="#6E5623" strokeWidth="1.2" />
+          <rect x="84" y="99" width="22" height="10" rx="3" fill="#000" opacity="0.12" />
+        </g>
+      )
     case 'dress':
       return (
         <g>
@@ -131,6 +154,17 @@ function draw(art: ArtSpec, main: string, detail: string, bg: string, uid: strin
             <circle key={y} cx="100" cy={y} r="1.8" fill={detail} />
           ))}
           <path d="M70 172 L92 100 M130 172 L108 100" stroke="#000" strokeOpacity="0.07" strokeWidth="2" />
+        </g>
+      )
+    case 'skirt':
+      return (
+        <g>
+          <path d={SKIRT} fill={main} />
+          <path d={SKIRT} fill="none" stroke="#000" strokeOpacity="0.12" strokeWidth="1.5" />
+          <rect x="70" y="52" width="60" height="12" fill={detail} />
+          {[-36, -18, 0, 18, 36].map((d) => (
+            <path key={d} d={`M${100 + d * 0.55} 64 L${100 + d * 1.25} 160`} stroke="#000" strokeOpacity="0.1" strokeWidth="2" />
+          ))}
         </g>
       )
     case 'pants':
@@ -348,6 +382,15 @@ function draw(art: ArtSpec, main: string, detail: string, bg: string, uid: strin
               <line key={`h${d}`} x1={100 - Math.sqrt(1 - (d / 50) ** 2) * 36} y1={74 + d} x2={100 + Math.sqrt(1 - (d / 50) ** 2) * 36} y2={74 + d} />
             ))}
           </g>
+        </g>
+      )
+    case 'paddle':
+      return (
+        <g>
+          <rect x="91" y="124" width="18" height="50" rx="6" fill={detail} />
+          <rect x="58" y="30" width="84" height="102" rx="38" fill={main} />
+          <rect x="58" y="30" width="84" height="102" rx="38" fill="none" stroke="#000" strokeOpacity="0.14" strokeWidth="1.5" />
+          <rect x="66" y="38" width="68" height="86" rx="31" fill="none" stroke={detail} strokeOpacity="0.35" strokeWidth="2" />
         </g>
       )
     case 'mat':
@@ -585,6 +628,23 @@ function Ball({ art, main, detail }: { art: ArtSpec; main: string; detail: strin
           <line x1="76" y1="104" x2="124" y2="104" stroke={detail} strokeWidth="4" strokeLinecap="round" />
           {[82, 92, 102, 112, 122].map((x) => (
             <line key={x} x1={x} y1="97" x2={x} y2="111" stroke={detail} strokeWidth="3" strokeLinecap="round" />
+          ))}
+        </g>
+      )
+    case 'soccer':
+      // An early leather ball: long curved panels and a laced slit.
+      return (
+        <g>
+          <circle cx="100" cy="104" r="54" fill={main} />
+          <g fill="none" stroke={detail} strokeWidth="2.5" strokeOpacity="0.7">
+            <path d="M100 50 Q76 104 100 158" />
+            <path d="M100 50 Q124 104 100 158" />
+            <path d="M48 92 Q100 112 152 92" />
+            <path d="M50 122 Q100 138 150 122" />
+          </g>
+          <path d="M92 60 L108 60" stroke={detail} strokeWidth="3" />
+          {[94, 100, 106].map((x) => (
+            <path key={x} d={`M${x - 3} 55 L${x + 3} 65 M${x + 3} 55 L${x - 3} 65`} stroke={detail} strokeWidth="1.8" />
           ))}
         </g>
       )

@@ -45,8 +45,8 @@ describe('profile learning', () => {
   it('discovers retro jerseys through behavior, not only onboarding', () => {
     // Picked soccer at onboarding, then kept saving vintage things.
     let p = seeded({ soccer: 1 })
-    const jacket = FIND_BY_ID['f-workjacket']
-    for (let i = 0; i < 3; i++) p = applyEvent(p, { kind: 'save', tags: jacket.tags, itemType: 'find' }, NOW).profile
+    const sweater = FIND_BY_ID['f-tricoteur']
+    for (let i = 0; i < 3; i++) p = applyEvent(p, { kind: 'save', tags: sweater.tags, itemType: 'find' }, NOW).profile
     expect(p.unlocked).toContain('retrojerseys')
   })
 
@@ -82,7 +82,7 @@ describe('ranking', () => {
   })
 
   it('never shows excluded (hidden) items', () => {
-    const exclude = ['f-copa-jersey', 'f-woolscarf', 'q-quality']
+    const exclude = ['f-copa-jersey', 'f-copa-scarf', 'q-quality']
     const items = batch(seeded({ soccer: 1, vintage: 1 }), { exclude })
     expect(items.map((r) => r.item.id)).not.toEqual(expect.arrayContaining(exclude))
   })

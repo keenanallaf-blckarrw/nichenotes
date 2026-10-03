@@ -141,27 +141,13 @@ function ShopSheet({ id }: { id: string }) {
         <p className="t-sub mt-1 text-ink-2">
           {item.name} · {price(item)}
         </p>
-        {shop.real ? (
-          <>
-            <p className="t-sub mt-5 max-w-[34ch] text-ink-2">You buy directly from {shop.name}, a small independent brand. Prices can change, so check theirs before you order.</p>
-            <a className="btn btn-primary btn-large mt-7 w-full" href={item.url ?? shop.url} target="_blank" rel="noopener noreferrer" onClick={ui.close}>
-              Open {shop.name}
-            </a>
-            <button className="btn btn-secondary btn-large mt-2 w-full" onClick={ui.close}>
-              Not now
-            </button>
-          </>
-        ) : (
-          <>
-            <p className="t-sub mt-5 max-w-[34ch] text-ink-2">
-              In the live app, this opens {shop.name}'s website. You buy directly from them, and NicheNotes earns a small commission at no cost to you.
-            </p>
-            <p className="t-foot mt-3 text-ink-3">This is a preview. {shop.name} is a sample shop.</p>
-            <button className="btn btn-primary btn-large mt-7 w-full" onClick={ui.close}>
-              Done
-            </button>
-          </>
-        )}
+        <p className="t-sub mt-5 max-w-[34ch] text-ink-2">You buy directly from {shop.name}, a small independent brand. Prices can change, so check theirs before you order.</p>
+        <a className="btn btn-primary btn-large mt-7 w-full" href={item.url ?? shop.url} target="_blank" rel="noopener noreferrer" onClick={ui.close}>
+          Open {shop.name}
+        </a>
+        <button className="btn btn-secondary btn-large mt-2 w-full" onClick={ui.close}>
+          Not now
+        </button>
       </div>
     </Sheet>
   )

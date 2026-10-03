@@ -29,7 +29,9 @@ The moat is **taste + trust**: an engine that actually gets you, and a feed that
 | **Clubs near you:** choose an area and a radius, see pickup games and meetups on a radar and by day, RSVP, chat in each event's discussion, post "near me" questions, host your own | Online communities turn into real-life ones, which is what keeps people coming back |
 | Display settings: text size, light or dark, plus the device's own accessibility settings | Usable by more people, including anyone who needs larger text |
 | Suggest a find | Community-sourced supply |
-| Partner slots with hard rules + sample brand dashboard | How brands pay, without ruining the feed |
+| Real catalog: about 100 small, independent brands, every link and price checked by `npm run check:links` | Great things nobody has heard of, for real |
+| Etsy and eBay "Hunt for you" searches picked from each person's taste, capped at $500 | Endless one-off finds beyond the catalog |
+| Partner slots with hard rules + sample brand dashboard (no paid partners yet) | How brands pay, without ruining the feed |
 
 ## How the engine works
 

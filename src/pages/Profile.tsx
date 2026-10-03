@@ -185,7 +185,7 @@ export function Profile() {
           </button>
         )}
       </section>
-      <p className="t-foot mt-3 px-1 text-ink-3">Preview version. Shops, products, usernames and posts are sample data, and everything stays on this device.</p>
+      <p className="t-foot mt-3 px-1 text-ink-3">Preview version. Every shop and product is a real independent brand. Usernames, posts and local events are examples for now, and everything you do stays on this device.</p>
     </div>
   )
 }

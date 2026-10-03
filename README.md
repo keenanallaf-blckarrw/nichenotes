@@ -7,7 +7,7 @@ A For You feed for anyone that learns your taste and leads you to great things n
 - daily habits
 - clubs of people into the same things, with pickup games and meetups near you
 
-This is a **working prototype**: a phone-first web app with a real recommendation engine, sample data and no backend. Everything a user does is stored on their device.
+This is a **working prototype**: a phone-first web app with a real recommendation engine, a catalog of real independent brands, and no backend yet. Everything a user does is stored on their device.
 
 - [`docs/PRODUCT.md`](docs/PRODUCT.md): product vision, business model and roadmap.
 - [`docs/DESIGN.md`](docs/DESIGN.md): the design principles (after Steve Jobs) and the token system.
@@ -28,6 +28,8 @@ npm test               # run the automated tests
 npm run build          # check types and build the site into dist/
 npm run deploy         # test, build and publish to GitHub Pages
 npm run build:artifact # the whole app as one file: dist-artifact/nichenotes.html
+npm run check:links    # open every brand link and compare prices (about 10 seconds)
+npm run lookup -- teotl.co lip balm   # list a Shopify shop's products, to add a brand
 ```
 
 ## Demo tips
@@ -47,8 +49,9 @@ src/
     rank.ts        Feed ranking: relevance, variety, exploration, partner slots
     explain.ts     "Why am I seeing this?" lines and the taste summary
     geo.ts         Distances, directions and privacy rounding for local features
-  data/          Sample catalog: quotes (with sources), shops, finds, outfits, clubs, posts, daily habits.
-                 local.ts generates sample events and posts around any area.
+  data/          brands.ts: every real shop and product. Also quotes (with sources), outfits, clubs,
+                 example posts and daily habits. local.ts generates example events around any area.
+                 market.ts holds the Etsy and eBay searches for every interest.
                  catalog.test.ts checks that every interest leads to real content.
   state/         App state (React context) and local persistence
   components/    Cards, sheets, the app shell, drawn product images
@@ -79,6 +82,10 @@ In every ten items:
 
 `src/data/market.ts` sends people to Etsy and eBay searches picked from their taste ("Hunt for you" on Discover, and on every interest and product page), capped at $500.
 
-## Sample data
+## Keeping the catalog honest
 
-Interests without real brands yet still use invented sample shops, marked as samples in the app. Usernames and posts are invented too. Quotes are real and carry their sources; lines that are only popularly credited are marked "Attributed".
+Every shop and product is real, and the bar is the same everywhere: small makers, natural materials, quality over quantity, and nothing over $500. The app describes products in its own words, draws them instead of copying brand photos, and links to each brand's own page.
+
+Shops change prices and retire products, so run `npm run check:links` every month or two (and before any deploy). It flags broken links, brands that moved, products that now land somewhere else, price changes, sales and sold-out items. Shops abroad are marked `approx` with their own-currency `shopPrice`, and "About $X" prices may drift 10% with exchange rates before they're flagged.
+
+Usernames, posts and local events are examples until accounts arrive. Quotes are real and carry their sources; lines that are only popularly credited are marked "Attributed".

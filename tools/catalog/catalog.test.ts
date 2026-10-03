@@ -65,6 +65,11 @@ describe('judging links', () => {
     expect(judgeLink('https://us.a.com', { status: 200, finalUrl: 'https://us.a.com/en' }, 'shop')).toEqual([])
   })
 
+  it('asks for a hand check when a shop blocks automatic visitors', () => {
+    const [issue] = judgeLink('https://a.com/products/x', { status: 403, finalUrl: 'https://a.com/products/x' }, 'product')
+    expect(issue.severity).toBe('note')
+  })
+
   it('treats subdomains as the same business', () => {
     expect(baseDomain('us.gonovesta.com')).toBe('gonovesta.com')
     expect(baseDomain('shop.example.co.uk')).toBe('example.co.uk')

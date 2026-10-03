@@ -6,6 +6,8 @@ Follow `docs/DESIGN.md` (Steve Jobs's principles): one primary action per card, 
 
 - Accessibility: font sizes in rem only (never px), icon buttons at least 44px, every control labeled.
 - Every interest must lead to real content; `src/data/catalog.test.ts` enforces it. When adding an interest, add finds, a club and posts in the same change.
+- Every shop and product is a real brand in `src/data/brands.ts`: small makers, natural materials, quality over quantity, max $500, for everyone (no political or exclusionary brands). Describe products in our own words, link to the brand's own product page, and never use brand photos or logos (products are drawn with `ObjectArt`). Only state facts the brand's site confirms.
+- Run `npm run check:links` after catalog changes and before deploys; fix every problem it lists. Shops that price in another currency get `approx: true` and `shopPrice`.
 
 - `npm test` runs the engine tests (vitest). `npm run build` typechecks then builds. `npm run deploy` publishes `dist/` to the `gh-pages` branch (GitHub Pages).
 - `public/sw.js` makes the hosted site work offline; bump its `CACHE` name when changing what it caches. It is never registered in dev or in the artifact build.
